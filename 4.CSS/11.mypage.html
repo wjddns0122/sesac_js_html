@@ -1,12 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>제 페이지를 소개합니다!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile {
+            background-color: rgba(128, 128, 128, 0.5);
+            width: 6%;
+            height: 12%;
+            border-radius: 50%;
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+
+        .name {
+            font-size: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .job {
+            font-size: 20px;
+            margin-top: 10px;
+            color: gray;
+            font-weight: 600;
+        }
+
+        .introduce {
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .skills {
+            font-size: 15px;
+            font-weight: bold;
+            position: relative;
+            right: 260px;
+            margin-top: 60px;
+        }
+
+        .skill-container {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin-right: 165px;
+            margin-top: 15px;
+        }
+
+        .skill {
+            border-radius: 5px;
+            background-color: rgb(232, 229, 229);
+            text-align: center;
+            width: 90px;
+            height: 40px;
+        }
+
+        .skill-word {
+            padding-top: 12px;
+            font-size: 15px;
+        }
+
+        .contact {
+            font-size: 18px;
+            padding-top: 70px;
+        }
+
+        .link-container {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin-top: 20px;
+
+        }
+
+        .link {
+            border-radius: 10px;
+            border: 1px solid rgb(232, 229, 229);
+            text-align: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .links {
+            margin-top: 10px;
+        }
+    </style>
 </head>
+
 <body>
-    <Center>
-        
-    </Center>
+    <div class="profile"></div> <!-- 프로필을 나타내는 div -->
+    <div class="name">
+        <p>NOH JEONGWOON</p>
+    </div>
+    <div class="job">
+        <p>Beginner Programmer</p>
+    </div>
+    <div class="introduce">
+        <p>Hello! I'm a beginner programmer learning web development. I enjoy building</p>
+        <p>simple projects and improving my coding skill every day.</p>
+    </div>
+    <div class="skills">
+        <p>Skills</p>
+    </div>
+    <div class="skill-container">
+        <div class="skill">
+            <p class="skill-word">HTML</p>
+        </div>
+        <div class="skill">
+            <p class="skill-word">CSS</p>
+        </div>
+        <div class="skill">
+            <p class="skill-word">JavaScript</p>
+        </div>
+        <div class="skill">
+            <p class="skill-word">React</p>
+        </div>
+    </div>
+    <div class="contact">
+        <p>Contact Me</p>
+    </div>
+    <div class="link-container">
+        <div class="link">
+            <div class="links">
+                <a href="">a</a>
+            </div>
+        </div>
+        <div class="link">
+            <div class="links">
+                <a href="">a</a>
+            </div>
+        </div>
+        <div class="link">
+            <div class="links">
+                <a href="">a</a>
+            </div>
+        </div>
+    </div>
 </body>
+
 </html>
