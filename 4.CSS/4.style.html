@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        /* class 가 보편적인가? id가 보편적인가. -> id가 더 보편적이라 우선으로 적용됌. */
+        /* 1. 디테일한것이 우선순위를 갖는다.
+        2. 그 레벨이 같으면, 늦게 칠한애가 우선순위를 갖늗다. (사실은 우선순위가 아니고 앞의 색을 덮어쓴거다.) */
+        /* tag, #id, .class */
+        /* 디테일 -> 보편적으로 */
+        #my_p1 {
+            border: none;
+            color: blue;
+        }
+        .my_bg_yellow {
+            color: black;
+            border: 1px solid red;
+            background-color: yellow;
+        }
+        .my_text_pink {
+            color: pink;
+        }
+        .my_text_blue {
+            color: blue;
+        }
+        p {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS 연습해보기</h1>
+    <p class="my_bg_yellow" id="my_p1">여기는 아무 문장이나 작성하시오</p>
+    <p>여기는 아무 문장이나 작성하시오</p>
+    <!-- 다중 속성 적용시 우선순위 알아둘 것 #id > .class > tag -->
+    <!-- 같은 레벨끼리는, 늦게 적용한 경우가 남계됨, 아래 class에 적용한 순서가
+    아닌, 위 style에 정의되어 있는 순서 기준 -->
+    <p class="my_bg_yellow my_text_pink my_text_blue">여기는 아무 문장이나 작성하시오</p>
+    <p class="my_bg_yellow">여기는 아무 문장이나 작성하시오</p>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        div {
+            width: 100px;
+            height: 100px;
+            background-color: orange;
+            color: white;
+            margin: 5px;
+        }
+        .move {
+            background-color: orangered;
+            position: relative;  /* 내가 원래 있던 위치에서 상대적으로 (대조군으로 absolute 와 비교해보기) */
+            top: 50px;   /* 위쪽 이만큼 뛴다.*/  
+            left: 50px;   /* 왼쪽을 ..*/
+        }
+        .text {
+            position: relative;
+            top: 20px;
+            left: 30px;
+        }
+        .picture {
+            width: 300px;
+            height: 200px;
+            background-image: url(image/image2.jpg);
+            background-size: 100% 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>절대위치와 상대위치</h1>
+    <div>1</div>
+    <div class="move">2</div>
+    <div>3</div>
+    <div class="picture"><p class="text">귀여운 고양이</p></div>
+</body>
+</html>
