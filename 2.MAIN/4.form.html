@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>내 페이지 타이틀</title>
+    </head>
+    <body>
+        <h1>입력폼 만들기</h1>
+        <label for="">아이디</label>
+        <input type="text"><br>
+        <label for="">비밀번호</label>
+        <input type="password"><br>
+        <input type="button" value="로그인">
+        <hr>
+        <h1>선택박스</h1>
+        <h2>과목고르기</h2>
+        <p>라디오버튼은 "name"을 중심으로 그중에 하나만 선택 가능</p>
+        <p>value값은 서버로 전송할때 보내질 글자임. 태그가 감싸는 내용은 화면에 보여지는 내용임.</p>
+        <input type="radio" name="subject" value="국어">국어
+        <input type="radio" name="subject" value="영어">영어
+        <input type="radio" name="subject" value="수학">수학
+        <input type="radio" name="subject" value="과학">과학
+        <h2>과일고르기</h2>
+        <input type="radio" name="fruit" value="st">딸기
+        <input type="radio" name="fruit" value="ap">사과
+        <input type="radio" name="fruit" value="wa">수박
+        <h2>설문조사용</h2>
+        <input type="radio" name="question1" value="1">매우불만족
+        <input type="radio" name="question1" value="2">불만족
+        <input type="radio" name="question1" value="3">보통
+        <input type="radio" name="question1" value="4">만족
+        <input type="radio" name="question1" value="5">매우만족
+        <h2>여러개를 선택하는 체크박스</h2>
+        <input type="checkbox" name="food" value="food1">돈까스
+        <input type="checkbox" name="food" value="food2">떡볶이
+        <input type="checkbox" name="food" value="food3">김밥
+        <h1>풀다운메뉴</h1>
+        <h2>아래항목중 하나 선택</h2>
+        <select>
+            <option>콜라</option>
+            <option>사이다</option>
+            <option>환타</option>
+            <option>봉봉</option>
+            <option>우유</option>
+        </select>
+        <h2>아래항목중 여러개 보여지게 만들기</h2>
+        <select size="5">
+            <option>콜라</option>
+            <option>사이다</option>
+            <option>환타</option>
+            <option>봉봉</option>
+            <option>우유</option>
+            <option>사과쥬스</option>
+            <option>딸기쥬스</option>
+            <option>커피</option>
+        </select>
+        <h2>아래항목에서 여러개 보여지고 여러개 선택되게 만들기 (멀티선택은 ctrl키와 함계...)</h2>
+        <select size="5" multiple>
+            <option>콜라</option>
+            <option>사이다</option>
+            <option>환타</option>
+            <option>봉봉</option>
+            <option>우유</option>
+            <option>사과쥬스</option>
+            <option>딸기쥬스</option>
+            <option>커피</option>
+        </select>
+    </body>
+    </html>
+    
