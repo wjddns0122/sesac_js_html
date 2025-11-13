@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>내 타이틀</title>
+    </head>
+    <body>
+        <h1>내 폼으로 데이터 서버 전송하기</h1>
+        <h2>가로 입력 로그인 폼</h2>
+        <form>
+            <label>아이디</label>
+            <!-- 주석을 편하게 쓰는 방법이 있는거 같다..어떻게 했을까?? 이건 어디 메뉴에서 찾아야 할까?? (cmd + /) 편집 메뉴에서 단축기 찾음-->
+            <!-- name은 서버로 전송할때의 "KEY", 사용자가 입력한 값은 "Value" 라고 불리며 전송됨 -->
+            <input type="text" name="id" placeholder="아이디를 입력해주세요.">
+            <label>비밀번호</label>
+            <!-- 여기서는 key가 pw, value는 사용자가 입력한 실제 비밀번호 -->
+            <input type="password" name="pw" placeholder="비밀번호를 입력해주세요.">
+            <!-- submit 타입은 실제로 이 form에 입력된 모든 값을 다 합쳐서 서버로 보내는 기능임 -->
+            <input type="submit" value="로그인">
+        </form>
+        <h2>세로 입력 로그인 폼</h2>
+        <!-- 전송 방식을 내가 지정하지 않으면 기본값은 GET방식이다. -->
+        <form method="post">
+            <label>아이디</label>
+            <input type="text" name="id"><br>
+            <label>비밀번호</label>
+            <input type="password" name="pw"><br>
+            <input type="submit" value="로그인">
+        </form>
+        <h2>네이버 따라하기</h2>
+        <!-- method="GET" or "get" 둘다 무방함, 또는 안써도 어차피 get이다. -->
+        <form method="get">
+            <label>검색</label>
+            <input type="text" name="query" placeholder="키워드를 입력해주세요.">
+            <input type="submit" value="검색">
+        </form>
+    </body>
+</html>
