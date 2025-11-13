@@ -54,7 +54,7 @@ body {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    margin-right: 165px;
+    margin-right: 265px;
     margin-top: 15px;
 }
 
@@ -62,8 +62,23 @@ body {
     border-radius: 5px;
     background-color: rgb(232, 229, 229);
     text-align: center;
-    width: 90px;
     height: 40px;
+}
+
+.skill-html {
+    width: 70px;
+}
+
+.skill-css {
+    width: 50px;
+}
+
+.skill-javascript {
+    width: 90px;
+}
+
+.skill-react {
+    width: 60px;
 }
 
 .skill-word {
