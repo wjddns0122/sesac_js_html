@@ -1,0 +1,30 @@
+h1, h2 {
+    text-align: center;
+}
+
+#calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#calendar th, td {
+    width: 14%;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid black;
+}
+
+#calendar th:nth-child(3) 
+#calendar th:nth-child(5) {
+    background-color: #dadada;
+}
+
+#calendar th:first-child, 
+#calendar td:first-child {
+    color: red;
+}
+
+#calendar th:last-child, 
+#calendar td:last-child {
+    color: blue;
+}
