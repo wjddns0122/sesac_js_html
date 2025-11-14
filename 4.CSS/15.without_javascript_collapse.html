@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeSAC 좌석 랜덤 배정 (CSS Edition)</title>
+    <style>
+        :root {
+            --bg: #eef1fb;
+            --card: #ffffff;
+            --text: #1f2833;
+            --muted: #677185;
+            --accent: #5468ff;
+            --accent-soft: rgba(84, 104, 255, 0.12);
+            --accent-strong: rgba(84, 104, 255, 0.25);
+            --success: #1cb370;
+            --warning: #f08c00;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Pretendard", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+            background: radial-gradient(circle at 20% 20%, #dfe3ff, var(--bg) 45%, #e8f0ff);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: clamp(1rem, 4vw, 2.5rem);
+        }
+
+        main {
+            width: min(1100px, 100%);
+            background: var(--card);
+            border-radius: 28px;
+            box-shadow: 0 35px 80px rgba(36, 48, 89, 0.2);
+            padding: clamp(1.5rem, 4vw, 3.8rem);
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: -0.03em;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 65ch;
+            line-height: 1.5;
+        }
+
+        .controls {
+            background: var(--accent-soft);
+            border-radius: 22px;
+            padding: clamp(1rem, 3vw, 1.6rem);
+            margin-bottom: 1.8rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .controls input,
+        .controls button {
+            border: none;
+            border-radius: 16px;
+            padding: 0.9rem 1.1rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .controls input {
+            background: #fff;
+            color: var(--muted);
+        }
+
+        .controls button {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 12px 25px var(--accent-strong);
+            cursor: not-allowed;
+        }
+
+        .note {
+            margin: -0.5rem 0 2rem;
+            font-size: 0.95rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .note strong {
+            color: var(--accent);
+        }
+
+        .seat-groups {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.4rem;
+        }
+
+        .group-card {
+            position: relative;
+            background: var(--card);
+            border-radius: 22px;
+            padding: 1.4rem;
+            border: 1px solid rgba(31, 40, 51, 0.08);
+            overflow: hidden;
+        }
+
+        .group-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, var(--group-color, var(--accent)), transparent 60%);
+            opacity: 0.12;
+        }
+
+        .group-header {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .group-header h3 {
+            margin: 0.2rem 0 0;
+            font-size: 1.3rem;
+            color: var(--group-color, var(--accent));
+        }
+
+        .group-header span {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        .group-header p {
+            margin: 0.3rem 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .seat-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.7rem;
+        }
+
+        .seat {
+            border-radius: 16px;
+            padding: 0.7rem 0.9rem;
+            border: 1px dashed rgba(31, 40, 51, 0.25);
+            background: #f8f9ff;
+            min-height: 66px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seat::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 30%, rgba(84, 104, 255, 0.4), transparent 70%);
+            transform: translateX(-100%);
+            animation: shuffle 3s infinite;
+        }
+
+        .seat:nth-child(odd)::after {
+            animation-delay: -1.5s;
+        }
+
+        .seat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .seat strong {
+            display: block;
+            font-size: 1.05rem;
+            margin-top: 0.15rem;
+        }
+
+        .seat.taken {
+            border-style: solid;
+            border-color: var(--group-color, var(--accent));
+            box-shadow: 0 8px 20px rgba(84, 104, 255, 0.18);
+        }
+
+        @keyframes shuffle {
+            0% {
+                transform: translateX(-100%);
+            }
+            40% {
+                transform: translateX(130%);
+            }
+            100% {
+                transform: translateX(130%);
+            }
+        }
+
+        .history {
+            margin-top: 2.4rem;
+        }
+
+        .history h2 {
+            margin: 0 0 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .history-item {
+            border-radius: 16px;
+            background: var(--accent-soft);
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .history-item strong {
+            color: var(--accent);
+        }
+
+        .timestamp {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        @media (max-width: 720px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+
+            .seat-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1>SeSAC 좌석 랜덤 배정</h1>
+            <p>HTML과 CSS만으로 구성한 연습 버전입니다. 애니메이션으로 랜덤 느낌을 살렸지만, 실제 자리 배정 기능은 자바스크립트나 서버 프로그램이 필요합니다.</p>
+        </header>
+
+        <section class="controls">
+            <input type="text" placeholder="이름을 입력하세요 (예: 노정운)" readonly>
+            <button type="button" title="HTML/CSS 버전">랜덤 배정</button>
+        </section>
+        <p class="note"><strong>TIP</strong> 실제 랜덤화는 14번 파일의 자바스크립트 예제를 참고해 보세요.</p>
+
+        <section class="seat-groups">
+            <article class="group-card" style="--group-color:#ff6b6b">
+                <div class="group-header">
+                    <span>4 Seats</span>
+                    <h3>Creative Pod</h3>
+                    <p>벽면 TV 앞쪽 4인 테이블</p>
+                </div>
+                <ul class="seat-list">
+                    <li class="seat taken">
+                        <span class="seat-label">Creative Pod 1</span>
+                        <strong>신지원</strong>
+                    </li>
+                    <li class="seat">
+                        <span class="seat-label">Creative Pod 2</span>
+                        <strong>남기정</strong>
+                    </li>
+                    <li class="seat">
+                        <span class="seat-label">Creative Pod 3</span>
+                        <strong>변영찬</strong>
+                    </li>
+                    <li class="seat">
+                        <span class="seat-label">Creative Pod 4</span>
+                        <strong>김윤군</strong>
+                    </li>
+                </ul>
+            </article>
+
+            <article class="group-card" style="--group-color:#845ef7">
+                <div class="group-header">
+                    <span>4 Seats</span>
+                    <h3>Focus Pod</h3>
+                    <p>강사님 앞 집중 좌석</p>
+                </div>
+                <ul class="seat-list">
+                    <li class="seat">
+                        <span class="seat-label">Focus Pod 1</span>
+                        <strong>이지안</strong>
+                    </li>
+                    <li class="seat taken">
+                        <span class="seat-label">Focus Pod 2</span>
+                        <strong>김준성</strong>
+                    </li>
+                    <li class="seat">
+                        <span class="seat-label">Focus Pod 3</span>
+                        <strong>김주연</strong>
+                    </li>
+                    <li class="seat">
+                        <span class="seat-label">Focus Pod 4</span>
+                        <strong>공정배</strong>
+                    </li>
+                </ul>
+            </article>
+
+            <article class="group-card" style="--group-color:#20c997">
+                <div class="group-header">
+                    <span>3 Seats</span>
+                    <h3>Team Space</h3>
+                    <p>창가 쪽 협업 테이블</p>
+                </div>
+                <ul class="seat-list">
+                    <li class="seat">
+                        <span class="seat-label">Team Space 1</span>
+                        <strong>이유랑</strong>
+                    </li>
+                    <li class="seat">
+                        <span class="seat-label">Team Space 2</span>
+                        <strong>노정운</strong>
+                    </li>
+                    <li class="seat taken">
+                        <span class="seat-label">Team Space 3</span>
+                        <strong>장수빈</strong>
+                    </li>
+                </ul>
+            </article>
+
+            <article class="group-card" style="--group-color:#fd7e14">
+                <div class="group-header">
+                    <span>2 Seats</span>
+                    <h3>Pair Desk</h3>
+                    <p>미니 프로젝트 전담석</p>
+                </div>
+                <ul class="seat-list">
+                    <li class="seat taken">
+                        <span class="seat-label">Pair Desk 1</span>
+                        <strong>박호정</strong>
+                    </li>
+                    <li class="seat">
+                        <span class="seat-label">Pair Desk 2</span>
+                        <strong>조진희</strong>
+                    </li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="history">
+            <h2>이번 주 배정 기록 (예시)</h2>
+            <ul class="history-list">
+                <li class="history-item">
+                    <span><strong>신지원</strong> → Creative Pod 1</span>
+                    <span class="timestamp">14:20</span>
+                </li>
+                <li class="history-item">
+                    <span><strong>김준성</strong> → Focus Pod 2</span>
+                    <span class="timestamp">14:24</span>
+                </li>
+                <li class="history-item">
+                    <span><strong>박호정</strong> → Pair Desk 1</span>
+                    <span class="timestamp">14:27</span>
+                </li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>
