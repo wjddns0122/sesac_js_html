@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="본 페이지는 서울의 주요 도시를 소개하는 페이지 입니다.">
+    <meta name="keywords" content="서울, 부산, 세종, 제주">
+    <meta name="author" content="OOO 관광공사">
+    <title>타이틀</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        /* 공통 디자인 */
+        header {
+            background-color: #555;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        nav {
+            background-color: #ccc;
+            padding: 20px;
+            float: left;
+            height: 300px;
+            width: 30%;
+        }
+
+        article {
+            background-color: #f1f1f1;
+            float: left;
+            width: 70%;
+            height: 300px;
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #777;
+            text-align: center;
+            padding: 10px;
+            color: white;
+        }
+
+        @media (max-width: 600px) { /* 모바일뷰 대응 - 600px 이하일때 */
+            nav, article {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 필요에 따라 시맨틱 태그로 영역을 구분하면 좋다 -->
+    <header>
+        <h1>도시</h1>
+    </header>
+    <section>
+        <nav>
+            <ul>
+                <li>서울</li>
+                <li>부산</li>
+                <li>세종</li>
+                <li>제주</li>
+            </ul>
+        </nav>
+        <article>
+            <h2>서울</h2>
+            <p>서울에 대한 소개글을 작성하는곳</p>
+        </article>
+    </section>
+
+    <footer>
+        <center>여기는 copyright를 작성하는곳</center>
+    </footer>
+</body>
+
+</html>
