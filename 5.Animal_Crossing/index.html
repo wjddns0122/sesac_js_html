@@ -7,8 +7,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="shadows-on">
-    <div class="app-frame">
-        <header class="hud">
+    <div class="game-stage">
+        <canvas id="gameCanvas" width="960" height="900" role="img" aria-label="Crossing Friends action field"></canvas>
+        <div id="fireworksLayer" aria-hidden="true"></div>
+
+        <div class="hud-panel">
             <div class="logo">
                 <span class="voxel-mark"></span>
                 <strong data-i18n="title">Crossing Friends</strong>
@@ -31,73 +34,97 @@
                     <span class="value" id="selectedCharacter">-</span>
                 </div>
             </div>
-            <button class="ghost" id="pauseButton" data-i18n="pause">Pause</button>
-        </header>
+        </div>
 
-        <main class="game-shell">
-            <canvas id="gameCanvas" width="960" height="900" role="img" aria-label="Crossing Friends action field"></canvas>
-            <div id="fireworksLayer" aria-hidden="true"></div>
-            <div id="idleWarning" class="warning-pill hidden" data-i18n="idleWarning">
-                Keep moving! An eagle is watching...
-            </div>
+        <button class="pause-button" id="pauseToggle" data-i18n="pause">Pause</button>
 
-            <section id="startScreen" class="overlay visible" tabindex="-1">
-                <div class="overlay-content">
-                    <p class="badge" data-i18n="voxelBadge">Voxel Animal Adventure</p>
-                    <h1 data-i18n="title">Crossing Friends</h1>
-                    <p data-i18n="tagline" class="tagline">
-                        Lead your friends through endless forests, roads and ponds.
-                    </p>
-                    <div class="start-meta">
-                        <div>
-                            <span data-i18n="best">Best</span>
-                            <strong id="startBest">0</strong>
-                        </div>
-                        <div>
-                            <span data-i18n="coins">Coins</span>
-                            <strong id="startCoins">0</strong>
-                        </div>
-                    </div>
-                    <div class="start-buttons">
-                        <button class="ghost" id="openCharacters" data-i18n="characterSelect">Character Select</button>
-                        <button class="ghost" id="openSettings" data-i18n="settings">Settings</button>
-                    </div>
-                    <p class="tap-hint" data-i18n="tapToStart">Tap anywhere to start</p>
-                    <p class="tap-hint" data-i18n="pressKey">Press any key to start</p>
-                </div>
-            </section>
+        <div id="idleWarning" class="warning-pill hidden" data-i18n="idleWarning">
+            Keep moving! An eagle is watching...
+        </div>
 
-            <section id="deathScreen" class="overlay hidden" tabindex="-1">
-                <div class="overlay-content">
-                    <h2 data-i18n="gameOver">Game Over</h2>
-                    <p id="deathReason"></p>
-                    <p class="score-callout">
-                        <span data-i18n="score">Score</span>
-                        <strong id="finalScore">0</strong>
-                    </p>
-                    <button id="restartButton" class="primary" data-i18n="playAgain">Play Again</button>
-                </div>
-            </section>
-
-            <section id="touchPad" aria-hidden="true">
-                <button data-direction="up">▲</button>
-                <div class="middle-row">
-                    <button data-direction="left">◀</button>
-                    <button data-direction="down">▼</button>
-                    <button data-direction="right">▶</button>
-                </div>
-            </section>
-        </main>
-
-        <footer class="helper-bar">
-            <div class="helper-text">
-                <span data-i18n="helper">Move in four directions, gather coins, avoid danger, and unlock voxel friends.</span>
-            </div>
+        <div class="helper-banner">
+            <p class="helper-text" data-i18n="helper">Move in four directions, gather coins, avoid danger, and unlock voxel friends.</p>
             <div class="helper-actions">
                 <button class="ghost small" id="openCharactersFooter" data-i18n="characterSelect">Character Select</button>
                 <button class="ghost small" id="openSettingsFooter" data-i18n="settings">Settings</button>
             </div>
-        </footer>
+        </div>
+
+        <section id="startScreen" class="overlay visible" tabindex="-1">
+            <div class="overlay-content">
+                <p class="badge" data-i18n="voxelBadge">Voxel Animal Adventure</p>
+                <h1 data-i18n="title">Crossing Friends</h1>
+                <p data-i18n="tagline" class="tagline">
+                    Lead your friends through endless forests, roads and ponds.
+                </p>
+                <div class="start-meta">
+                    <div>
+                        <span data-i18n="best">Best</span>
+                        <strong id="startBest">0</strong>
+                    </div>
+                    <div>
+                        <span data-i18n="coins">Coins</span>
+                        <strong id="startCoins">0</strong>
+                    </div>
+                </div>
+                <div class="start-buttons">
+                    <button class="ghost" id="openCharacters" data-i18n="characterSelect">Character Select</button>
+                    <button class="ghost" id="openSettings" data-i18n="settings">Settings</button>
+                </div>
+                <p class="tap-hint" data-i18n="tapToStart">Tap anywhere to start</p>
+                <p class="tap-hint" data-i18n="pressKey">Press any key to start</p>
+            </div>
+        </section>
+
+        <section id="deathScreen" class="overlay hidden" tabindex="-1">
+            <div class="overlay-content">
+                <h2 data-i18n="gameOver">Game Over</h2>
+                <p id="deathReason"></p>
+                <p class="score-callout">
+                    <span data-i18n="score">Score</span>
+                    <strong id="finalScore">0</strong>
+                </p>
+                <button id="restartButton" class="primary" data-i18n="playAgain">Play Again</button>
+            </div>
+        </section>
+
+        <section id="pauseOverlay" class="overlay hidden" tabindex="-1">
+            <div class="overlay-content">
+                <h2 data-i18n="pausedTitle">Paused</h2>
+                <div class="settings-group pause-settings">
+                    <label>
+                        <span data-i18n="language">Language</span>
+                        <select id="pauseLanguageSelect">
+                            <option value="ko">한국어</option>
+                            <option value="en">English</option>
+                        </select>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="pauseAudioToggle" checked>
+                        <span class="slider"></span>
+                        <span class="switch-label" data-i18n="audio">Audio</span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="pauseShadowToggle" checked>
+                        <span class="slider"></span>
+                        <span class="switch-label" data-i18n="shadows">Shadow Effects</span>
+                    </label>
+                </div>
+                <div class="start-buttons pause-actions">
+                    <button id="resumeButton" class="primary" data-i18n="resume">Resume</button>
+                    <button id="resetRunButton" class="ghost" data-i18n="resetRun">Reset Run</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="touchPad" aria-hidden="true">
+            <button data-direction="up">▲</button>
+            <div class="middle-row">
+                <button data-direction="left">◀</button>
+                <button data-direction="down">▼</button>
+                <button data-direction="right">▶</button>
+            </div>
+        </section>
     </div>
 
     <section id="characterModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="characterTitle">

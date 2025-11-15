@@ -38,30 +38,53 @@ body {
     font-family: "EightBitWonder", sans-serif;
     background: radial-gradient(circle at 20% 0%, #18344f 0%, var(--bg-color) 60%);
     color: var(--text);
-    display: flex;
-    flex-direction: column;
-}
-
-.app-frame {
+    min-height: 100vh;
     width: 100%;
-    min-height: 100%;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    flex: 1;
+    overflow: hidden;
 }
 
-.hud {
+.game-stage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #08121f;
+}
+
+body.shadows-on #gameCanvas {
+    box-shadow: 0px 12px 50px rgba(0, 0, 0, 0.55);
+}
+
+body:not(.shadows-on) #gameCanvas {
+    box-shadow: none;
+}
+
+#fireworksLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.hud-panel {
+    position: absolute;
+    top: 16px;
+    left: 16px;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--panel);
-    padding: 16px 20px;
-    border-radius: 18px;
-    border: 1px solid rgba(126, 243, 255, 0.3);
+    flex-direction: column;
     gap: 12px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: var(--panel);
+    border: 1px solid rgba(126, 243, 255, 0.3);
+    max-width: 340px;
+    z-index: 5;
 }
 
 .logo {
@@ -124,48 +147,24 @@ body {
     color: var(--accent-strong);
 }
 
-#pauseButton {
-    min-width: 110px;
-}
-
-.game-shell {
-    flex: 1;
-    min-height: 0;
-    position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 24px;
-    overflow: hidden;
-}
-
-#gameCanvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-    background: #08121f;
-}
-
-body.shadows-on #gameCanvas {
-    box-shadow: 0px 12px 50px rgba(0, 0, 0, 0.55);
-}
-
-body:not(.shadows-on) #gameCanvas {
-    box-shadow: none;
-}
-
-#fireworksLayer {
+.pause-button {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
+    right: 16px;
+    top: 16px;
+    min-width: 110px;
+    border-radius: 16px;
+    padding: 10px 18px;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 5;
 }
 
 .warning-pill {
     position: absolute;
-    right: 12px;
-    top: 12px;
+    right: 16px;
+    top: 70px;
     padding: 8px 14px;
     background: rgba(255, 255, 255, 0.12);
     border-radius: 18px;
@@ -174,10 +173,75 @@ body:not(.shadows-on) #gameCanvas {
     text-transform: uppercase;
     letter-spacing: 1px;
     animation: pulse 1.4s ease-in-out infinite;
+    z-index: 5;
 }
 
 .warning-pill.hidden {
     display: none;
+}
+
+.helper-banner {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 12px 18px;
+    z-index: 5;
+}
+
+.helper-text {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+    flex: 1;
+}
+
+.helper-actions {
+    display: flex;
+    gap: 8px;
+}
+
+button {
+    border: none;
+    border-radius: 14px;
+    padding: 10px 18px;
+    font-size: 14px;
+    color: #041017;
+    cursor: pointer;
+    font-family: "EightBitWonder", sans-serif;
+    text-transform: uppercase;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+button.primary {
+    background: linear-gradient(135deg, #2ee0d8 0%, #1f6deb 100%);
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+.ghost {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ghost.small {
+    padding: 8px 14px;
+    font-size: 12px;
 }
 
 .overlay {
@@ -192,6 +256,7 @@ body:not(.shadows-on) #gameCanvas {
     justify-content: center;
     text-align: center;
     transition: opacity 0.3s ease;
+    z-index: 10;
 }
 
 .overlay.hidden {
@@ -284,61 +349,21 @@ body:not(.shadows-on) #gameCanvas {
     margin-top: 4px;
 }
 
-.helper-bar {
+.pause-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 12px 18px;
-}
-
-.helper-text {
-    font-size: 12px;
-    color: var(--muted);
-}
-
-.helper-actions {
-    display: flex;
-    gap: 8px;
-}
-
-button {
-    border: none;
-    border-radius: 14px;
-    padding: 10px 18px;
-    font-size: 14px;
-    color: #041017;
-    cursor: pointer;
-    font-family: "EightBitWonder", sans-serif;
-    text-transform: uppercase;
-}
-
-button.primary {
-    background: linear-gradient(135deg, #2ee0d8 0%, #1f6deb 100%);
-}
-
-.ghost {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.ghost.small {
-    padding: 8px 14px;
-    font-size: 12px;
+    gap: 12px;
+    justify-content: center;
 }
 
 #touchPad {
     display: none;
     position: absolute;
-    left: 12px;
-    bottom: 12px;
+    left: 16px;
+    bottom: 120px;
     flex-direction: column;
     gap: 4px;
+    opacity: 0.8;
+    z-index: 5;
 }
 
 #touchPad button {
@@ -542,12 +567,13 @@ button.primary {
 }
 
 @media (max-width: 900px) {
-    .app-frame {
-        padding: 12px;
+    .hud-panel {
+        max-width: none;
+        right: 16px;
     }
-    .hud {
-        flex-direction: column;
-        align-items: flex-start;
+    .pause-button {
+        top: auto;
+        bottom: 160px;
     }
     #touchPad {
         display: flex;

@@ -14,10 +14,11 @@ const TYPE_WEIGHTS = [
     { type: "rail", weight: 0.18 }
 ];
 
+const BASE_LOG_SPEED = randomRange(1.2, 1.5);
 const MOVEMENT_SPEEDS = {
-    car: randomRange(3.6, 4.2),
-    truck: randomRange(4.5, 5.1),
-    log: randomRange(1.2, 1.5),
+    log: BASE_LOG_SPEED,
+    car: BASE_LOG_SPEED * 1.2,
+    truck: BASE_LOG_SPEED * 1.2,
     train: randomRange(8, 10.5)
 };
 
@@ -68,7 +69,9 @@ const I18N = {
         pressKey: "Press any key to start",
         pause: "Pause",
         resume: "Resume",
+        resetRun: "Reset Run",
         paused: "Game paused",
+        pausedTitle: "Game Paused",
         newBestRun: "New run record! {score}"
     },
     ko: {
@@ -117,7 +120,9 @@ const I18N = {
         pressKey: "아무 키나 눌러 시작",
         pause: "일시정지",
         resume: "계속하기",
+        resetRun: "게임 리셋",
         paused: "게임이 일시정지되었습니다.",
+        pausedTitle: "게임 일시정지",
         newBestRun: "새 기록! {score}점"
     }
 };
@@ -173,7 +178,13 @@ const dom = {
     languageSelect: document.getElementById("languageSelect"),
     audioToggle: document.getElementById("audioToggle"),
     shadowToggle: document.getElementById("shadowToggle"),
-    pauseButton: document.getElementById("pauseButton")
+    pauseOverlay: document.getElementById("pauseOverlay"),
+    pauseToggle: document.getElementById("pauseToggle"),
+    resumeButton: document.getElementById("resumeButton"),
+    resetRunButton: document.getElementById("resetRunButton"),
+    pauseLanguageSelect: document.getElementById("pauseLanguageSelect"),
+    pauseAudioToggle: document.getElementById("pauseAudioToggle"),
+    pauseShadowToggle: document.getElementById("pauseShadowToggle")
 };
 
 const state = {
@@ -204,6 +215,9 @@ let paused = false;
 let runFireworksShown = false;
 let pendingBestScore = null;
 let pendingBestRow = null;
+let runFurthestRow = 0;
+let speedLevel = 0;
+let speedMultiplier = 1;
 
 let sound;
 
@@ -260,6 +274,7 @@ function loadSave() {
     state.shadows = Boolean(defaultSave.settings.shadows);
     document.body.classList.toggle("shadows-on", state.shadows);
     sound.setEnabled(state.audio);
+    syncSettingsControls();
 }
 
 function persistSave() {
@@ -302,30 +317,29 @@ function setupUI() {
     dom.shadowToggle.checked = state.shadows;
 
     dom.languageSelect.addEventListener("change", () => {
-        state.language = dom.languageSelect.value;
-        document.documentElement.lang = state.language;
-        updateI18n();
-        updateCharacterList();
-        updateSelectedCharacterDisplay();
-        persistSave();
+        setLanguage(dom.languageSelect.value);
+    });
+    dom.pauseLanguageSelect.addEventListener("change", () => {
+        setLanguage(dom.pauseLanguageSelect.value);
     });
 
     dom.audioToggle.addEventListener("change", () => {
-        state.audio = dom.audioToggle.checked;
-        sound.setEnabled(state.audio);
-        persistSave();
+        setAudioEnabled(dom.audioToggle.checked);
+    });
+    dom.pauseAudioToggle.addEventListener("change", () => {
+        setAudioEnabled(dom.pauseAudioToggle.checked);
     });
 
     dom.shadowToggle.addEventListener("change", () => {
-        state.shadows = dom.shadowToggle.checked;
-        document.body.classList.toggle("shadows-on", state.shadows);
-        if (!state.shadows) {
-            announce(t("shadowsOff"));
-        }
-        persistSave();
+        setShadowsEnabled(dom.shadowToggle.checked);
+    });
+    dom.pauseShadowToggle.addEventListener("change", () => {
+        setShadowsEnabled(dom.pauseShadowToggle.checked);
     });
 
-    dom.pauseButton.addEventListener("click", () => togglePause());
+    dom.pauseToggle.addEventListener("click", () => togglePause());
+    dom.resumeButton.addEventListener("click", () => togglePause(false));
+    dom.resetRunButton.addEventListener("click", () => resetGameFromPause());
 
     document.querySelectorAll(".modal").forEach(modal => {
         modal.addEventListener("click", evt => {
@@ -339,9 +353,11 @@ function setupUI() {
     });
 
     window.addEventListener("keydown", evt => {
-        if (evt.key === "Escape") {
-            closeModal(dom.characterModal);
-            closeModal(dom.settingsModal);
+        if (evt.code === "Escape") {
+            if (gameRunning && player?.alive) {
+                evt.preventDefault();
+                togglePause();
+            }
             return;
         }
         const canStart = dom.startScreen.classList.contains("visible") &&
@@ -353,11 +369,7 @@ function setupUI() {
             startGame();
             return;
         }
-        if (evt.code === "Space" && gameRunning) {
-            evt.preventDefault();
-            togglePause();
-            return;
-        }
+        if (paused) return;
         handleKey(evt);
     });
 
@@ -369,7 +381,59 @@ function setupUI() {
 
     updateCharacterList();
     updateSelectedCharacterDisplay();
-    dom.pauseButton.disabled = true;
+    dom.pauseToggle.disabled = true;
+}
+
+function syncSettingsControls() {
+    if (dom.languageSelect) dom.languageSelect.value = state.language;
+    if (dom.pauseLanguageSelect) dom.pauseLanguageSelect.value = state.language;
+    if (dom.audioToggle) dom.audioToggle.checked = state.audio;
+    if (dom.pauseAudioToggle) dom.pauseAudioToggle.checked = state.audio;
+    if (dom.shadowToggle) dom.shadowToggle.checked = state.shadows;
+    if (dom.pauseShadowToggle) dom.pauseShadowToggle.checked = state.shadows;
+}
+
+function setLanguage(value) {
+    if (!value) return;
+    state.language = value;
+    document.documentElement.lang = state.language;
+    syncSettingsControls();
+    updateI18n();
+    updateCharacterList();
+    updateSelectedCharacterDisplay();
+    persistSave();
+}
+
+function setAudioEnabled(enabled) {
+    state.audio = Boolean(enabled);
+    sound.setEnabled(state.audio);
+    syncSettingsControls();
+    persistSave();
+}
+
+function setShadowsEnabled(enabled) {
+    state.shadows = Boolean(enabled);
+    document.body.classList.toggle("shadows-on", state.shadows);
+    if (!state.shadows) {
+        announce(t("shadowsOff"));
+    }
+    syncSettingsControls();
+    persistSave();
+}
+
+function resetGameFromPause() {
+    paused = false;
+    dom.pauseOverlay.classList.add("hidden");
+    dom.pauseToggle.textContent = t("pause");
+    dom.pauseToggle.disabled = true;
+    dom.startScreen.classList.add("visible");
+    dom.startScreen.classList.remove("hidden");
+    dom.deathScreen.classList.add("hidden");
+    dom.idleWarning.classList.add("hidden");
+    gameRunning = false;
+    resetWorld();
+    updateScoreDisplays();
+    announce(t("helper"));
 }
 
 function startGame() {
@@ -382,8 +446,9 @@ function startGame() {
     pendingBestScore = null;
     pendingBestRow = null;
     runFireworksShown = false;
-    dom.pauseButton.disabled = false;
-    dom.pauseButton.textContent = t("pause");
+    dom.pauseToggle.disabled = false;
+    dom.pauseToggle.textContent = t("pause");
+    dom.pauseOverlay.classList.add("hidden");
     dom.idleWarning.classList.add("hidden");
     resetWorld();
     gameRunning = true;
@@ -407,6 +472,9 @@ function resetWorld() {
     state.score = 0;
     floatingTexts = [];
     player = createPlayer();
+    runFurthestRow = player.gridY;
+    speedLevel = 0;
+    speedMultiplier = 1;
     friendClones = createClones();
     pathHistory = [{ x: player.gridX, y: player.gridY }];
     cameraY = player.gridY * TILE_SIZE - canvas.height * 0.35;
@@ -570,12 +638,16 @@ function handleDirection(direction) {
     attemptMove(delta.x, delta.y);
 }
 
-function togglePause() {
+function togglePause(forceState) {
     if (!gameRunning || !player || !player.alive) return;
-    paused = !paused;
-    dom.pauseButton.textContent = paused ? t("resume") : t("pause");
+    const nextState = typeof forceState === "boolean" ? forceState : !paused;
+    if (nextState === paused) return;
+    paused = nextState;
+    dom.pauseToggle.textContent = paused ? t("resume") : t("pause");
+    dom.pauseOverlay.classList.toggle("hidden", !paused);
     if (paused) {
         announce(t("paused"));
+        syncSettingsControls();
     } else {
         player.lastMoveTime = performance.now();
         dom.idleWarning.classList.add("hidden");
@@ -595,6 +667,7 @@ function attemptMove(dx, dy) {
         return;
     }
     const forwardMove = dy > 0;
+    const advancesIntoNewRow = forwardMove && targetY > runFurthestRow;
 
     player.startX = player.gridX;
     player.startY = player.gridY;
@@ -609,7 +682,8 @@ function attemptMove(dx, dy) {
     player.lastMoveTime = performance.now();
     dom.idleWarning.classList.add("hidden");
 
-    if (forwardMove) {
+    if (advancesIntoNewRow) {
+        runFurthestRow = targetY;
         handleForwardAdvance(targetY);
     }
     pathHistory.push({ x: targetX, y: targetY });
@@ -637,6 +711,7 @@ function updateSelectedCharacterDisplay() {
 function handleForwardAdvance(rowIndex) {
     state.score += 1;
     updateScoreDisplays();
+    updateSpeedMultiplier();
     if (state.score > state.bestScore) {
         if (!runFireworksShown) {
             addFloatingText(t("pbOnPath", { score: state.score }), player.targetX, rowIndex + 0.3);
@@ -658,6 +733,14 @@ function finalizeRunBest() {
     pendingBestScore = null;
     pendingBestRow = null;
     runFireworksShown = false;
+}
+
+function updateSpeedMultiplier() {
+    const targetLevel = Math.floor(state.score / 100);
+    if (targetLevel > speedLevel) {
+        speedLevel = targetLevel;
+        speedMultiplier = Math.pow(1.1, speedLevel);
+    }
 }
 
 function updateHUD() {
@@ -786,7 +869,7 @@ function updateWorld(dt) {
         if (row.type === "road") {
             row.spawnTimer -= dt;
             row.vehicles.forEach(vehicle => {
-                vehicle.x += vehicle.speed * dt;
+                vehicle.x += vehicle.speed * speedMultiplier * dt;
             });
             row.vehicles = row.vehicles.filter(vehicle => vehicle.x < GRID_WIDTH + 5 && vehicle.x + vehicle.length > -5);
             if (row.spawnTimer <= 0) {
@@ -796,7 +879,7 @@ function updateWorld(dt) {
         } else if (row.type === "pond") {
             row.wave += dt * 0.6;
             row.logs.forEach(log => {
-                log.x += log.speed * dt;
+                log.x += log.speed * speedMultiplier * dt;
                 if (row.direction === 1 && log.x > GRID_WIDTH + 3) {
                     log.x = -log.length - randomRange(0, 2);
                 } else if (row.direction === -1 && log.x + log.length < -3) {
@@ -825,7 +908,7 @@ function updateWorld(dt) {
                 }
             } else if (row.warningState === "train") {
                 if (row.train) {
-                    row.train.x += row.train.speed * dt;
+                    row.train.x += row.train.speed * speedMultiplier * dt;
                     if (row.direction === 1 && row.train.x > GRID_WIDTH + 8) {
                         finishTrain(row);
                     } else if (row.direction === -1 && row.train.x + row.train.length < -8) {
@@ -841,11 +924,26 @@ function spawnVehicle(row) {
     const type = Math.random() < 0.6 ? "car" : "truck";
     const length = type === "car" ? 1.2 : 2;
     const startX = row.direction === 1 ? -length - randomRange(0, 2) : GRID_WIDTH + randomRange(0, 2);
+    if (!canSpawnVehicle(row, startX, length)) {
+        row.spawnTimer += 0.2;
+        return;
+    }
     row.vehicles.push({
         type,
         x: startX,
         length,
         speed: MOVEMENT_SPEEDS[type] * row.direction
+    });
+}
+
+function canSpawnVehicle(row, startX, length) {
+    const buffer = 0.8;
+    const minRange = startX - buffer;
+    const maxRange = startX + length + buffer;
+    return row.vehicles.every(vehicle => {
+        const vehicleMin = vehicle.x - buffer;
+        const vehicleMax = vehicle.x + vehicle.length + buffer;
+        return maxRange < vehicleMin || minRange > vehicleMax;
     });
 }
 
@@ -1019,8 +1117,9 @@ function killPlayer(reason) {
     paused = false;
     player.deathAnimation = createDeathAnimation(reason);
     finalizeRunBest();
-    dom.pauseButton.disabled = true;
-    dom.pauseButton.textContent = t("pause");
+    dom.pauseToggle.disabled = true;
+    dom.pauseToggle.textContent = t("pause");
+    dom.pauseOverlay.classList.add("hidden");
     dom.idleWarning.classList.add("hidden");
     dom.deathScreen.classList.remove("hidden");
     dom.deathReason.textContent = t(`death_${reason}`) || t("death_unknown");
@@ -1300,7 +1399,15 @@ function updateI18n() {
         const label = el.querySelector(".label");
         if (label) label.textContent = t(key);
     });
-    dom.pauseButton.textContent = paused ? t("resume") : t("pause");
+    if (dom.pauseToggle) {
+        dom.pauseToggle.textContent = paused ? t("resume") : t("pause");
+    }
+    if (dom.resumeButton) {
+        dom.resumeButton.textContent = t("resume");
+    }
+    if (dom.resetRunButton) {
+        dom.resetRunButton.textContent = t("resetRun");
+    }
     document.documentElement.lang = state.language;
     announce(t("helper"));
     updateSelectedCharacterDisplay();
