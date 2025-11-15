@@ -1,14 +1,24 @@
 :root {
     color-scheme: light dark;
-    --bg: #0b0f16;
-    --panel: rgba(12, 20, 32, 0.85);
+    --bg-color: #050912;
+    --panel: rgba(12, 20, 32, 0.9);
     --accent: #7ef3ff;
     --accent-strong: #1fe8c2;
     --text: #f4f8ff;
     --muted: #9db5cc;
     --danger: #ff6b6b;
-    --forest: #1d4737;
-    --forest-light: #2b6b4c;
+}
+
+@font-face {
+    font-family: "EightBitWonder";
+    src: url("fonts/8bit-wonder.ttf") format("truetype");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "CrossyRoad";
+    src: url("fonts/crossy-road.ttf") format("truetype");
+    font-display: swap;
 }
 
 *,
@@ -17,131 +27,152 @@
     box-sizing: border-box;
 }
 
+html,
+body {
+    height: 100%;
+}
+
 body {
     margin: 0;
-    min-height: 100vh;
-    font-family: "Pretendard", "Segoe UI", "Apple SD Gothic Neo", sans-serif;
-    background: radial-gradient(circle at top, #1c2b38 0%, #070a10 55%, #03050a 100%);
+    padding: 0;
+    font-family: "EightBitWonder", sans-serif;
+    background: radial-gradient(circle at 20% 0%, #18344f 0%, var(--bg-color) 60%);
     color: var(--text);
     display: flex;
-    justify-content: center;
-    padding: 20px;
-    transition: background 0.4s ease;
-}
-
-body.shadows-on #gameCanvas {
-    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.55);
-}
-
-body:not(.shadows-on) #gameCanvas {
-    box-shadow: none;
+    flex-direction: column;
 }
 
 .app-frame {
-    width: min(1200px, 100%);
+    width: 100%;
+    min-height: 100%;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    flex: 1;
 }
 
 .hud {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
     align-items: center;
-    background: rgba(5, 10, 18, 0.8);
-    border: 1px solid rgba(126, 243, 255, 0.2);
+    justify-content: space-between;
+    background: var(--panel);
+    padding: 16px 20px;
     border-radius: 18px;
-    padding: 18px 26px;
-    backdrop-filter: blur(25px);
+    border: 1px solid rgba(126, 243, 255, 0.3);
+    gap: 12px;
 }
 
 .logo {
     display: flex;
     align-items: center;
     gap: 12px;
-    letter-spacing: 0.06em;
+    letter-spacing: 1px;
+    font-size: 18px;
     text-transform: uppercase;
-    font-size: 1.05rem;
 }
 
 .voxel-mark {
     width: 34px;
     height: 34px;
-    background: linear-gradient(135deg, #2ee0d8, #00bfa6 55%, #1b758b);
     border-radius: 8px;
+    background: linear-gradient(135deg, #28dcc6 0%, #0d6fad 100%);
     position: relative;
 }
 
 .voxel-mark::after {
     content: "";
     position: absolute;
-    inset: 8px;
-    background: rgba(255, 255, 255, 0.15);
+    left: 8px;
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
     border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .hud-stats {
     display: flex;
-    gap: 18px;
     flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
 }
 
 .stat {
-    min-width: 88px;
-    padding: 10px 16px;
-    border-radius: 14px;
-    border: 1px solid rgba(126, 243, 255, 0.2);
-    background: rgba(255, 255, 255, 0.03);
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    min-width: 90px;
+    text-align: center;
 }
 
 .stat .label {
-    font-size: 0.75rem;
+    display: block;
+    font-size: 12px;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    margin-bottom: 6px;
 }
 
 .stat .value {
-    display: block;
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 22px;
+    color: var(--text);
 }
 
 .stat.coins .value {
     color: var(--accent-strong);
 }
 
+#pauseButton {
+    min-width: 110px;
+}
+
 .game-shell {
+    flex: 1;
+    min-height: 0;
     position: relative;
-    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 #gameCanvas {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
-    background: #0d141f;
+    background: #08121f;
+}
+
+body.shadows-on #gameCanvas {
+    box-shadow: 0px 12px 50px rgba(0, 0, 0, 0.55);
+}
+
+body:not(.shadows-on) #gameCanvas {
+    box-shadow: none;
 }
 
 #fireworksLayer {
     position: absolute;
-    inset: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     overflow: hidden;
 }
 
 .warning-pill {
     position: absolute;
-    top: 14px;
-    right: 14px;
-    padding: 10px 16px;
-    background: rgba(255, 255, 255, 0.09);
-    border-radius: 999px;
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    right: 12px;
+    top: 12px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     animation: pulse 1.4s ease-in-out infinite;
 }
 
@@ -151,8 +182,11 @@ body:not(.shadows-on) #gameCanvas {
 
 .overlay {
     position: absolute;
-    inset: 0;
-    background: rgba(2, 6, 13, 0.8);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(5, 8, 14, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -161,8 +195,8 @@ body:not(.shadows-on) #gameCanvas {
 }
 
 .overlay.hidden {
-    pointer-events: none;
     opacity: 0;
+    pointer-events: none;
 }
 
 .overlay.visible {
@@ -170,96 +204,101 @@ body:not(.shadows-on) #gameCanvas {
 }
 
 .overlay .overlay-content {
-    background: rgba(8, 15, 24, 0.85);
-    padding: 40px 50px;
-    border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: 90%;
     max-width: 520px;
-    width: min(90%, 520px);
+    padding: 32px 40px;
+    background: rgba(6, 14, 25, 0.95);
+    border-radius: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .overlay .badge {
-    font-size: 0.85rem;
-    padding: 8px 14px;
-    border-radius: 999px;
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 18px;
     background: rgba(126, 243, 255, 0.15);
-    color: var(--accent-strong);
-    display: inline-flex;
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
 }
 
 .overlay h1,
 .overlay h2 {
-    margin: 18px 0 8px;
-    font-size: clamp(2rem, 5vw, 3rem);
+    margin: 12px 0;
+    font-size: 40px;
 }
 
 .overlay .tagline {
+    margin: 0 0 20px 0;
     color: var(--muted);
-    margin-bottom: 18px;
+    font-size: 14px;
+    line-height: 150%;
 }
 
 .start-meta {
     display: flex;
     justify-content: center;
-    gap: 30px;
-    margin-bottom: 20px;
+    gap: 22px;
+    margin-bottom: 18px;
 }
 
 .start-meta span {
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 0.8rem;
+    display: block;
+    font-size: 12px;
     color: var(--muted);
+    letter-spacing: 1px;
 }
 
 .start-meta strong {
     display: block;
-    font-size: 1.8rem;
+    margin-top: 6px;
+    font-size: 26px;
     color: var(--accent);
 }
 
 .start-buttons {
     display: flex;
-    justify-content: center;
     gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
     margin-bottom: 10px;
 }
 
 .tap-hint {
-    font-size: 0.95rem;
-    letter-spacing: 0.08em;
+    margin-top: 14px;
+    font-size: 12px;
     text-transform: uppercase;
-    margin-top: 22px;
+    letter-spacing: 1px;
     color: var(--muted);
 }
 
 .score-callout {
-    font-size: 1rem;
+    font-size: 16px;
     color: var(--muted);
 }
 
 .score-callout strong {
-    font-size: 2rem;
-    color: #fff;
+    font-size: 32px;
+    display: block;
+    margin-top: 4px;
 }
 
 .helper-bar {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.04);
-    padding: 12px 22px;
-    border-radius: 18px;
-    border: 1px solid rgba(126, 243, 255, 0.08);
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 12px 18px;
 }
 
 .helper-text {
+    font-size: 12px;
     color: var(--muted);
-    font-size: 0.95rem;
 }
 
 .helper-actions {
@@ -269,55 +308,43 @@ body:not(.shadows-on) #gameCanvas {
 
 button {
     border: none;
-    border-radius: 16px;
-    font-size: 1rem;
-    padding: 12px 20px;
+    border-radius: 14px;
+    padding: 10px 18px;
+    font-size: 14px;
+    color: #041017;
     cursor: pointer;
-    font-weight: 600;
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    font-family: "EightBitWonder", sans-serif;
+    text-transform: uppercase;
 }
 
 button.primary {
-    background: linear-gradient(130deg, #2ee0d8, #1f6deb);
-    color: #041017;
-}
-
-button:hover {
-    transform: translateY(-1px);
-}
-
-button:active {
-    transform: translateY(1px);
+    background: linear-gradient(135deg, #2ee0d8 0%, #1f6deb 100%);
 }
 
 .ghost {
-    background: rgba(255, 255, 255, 0.07);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .ghost.small {
     padding: 8px 14px;
-    font-size: 0.85rem;
+    font-size: 12px;
 }
 
 #touchPad {
     display: none;
     position: absolute;
-    bottom: 16px;
-    left: 16px;
+    left: 12px;
+    bottom: 12px;
     flex-direction: column;
     gap: 4px;
-    opacity: 0.75;
 }
 
 #touchPad button {
     width: 52px;
     height: 52px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #fff;
-    pointer-events: auto;
+    border-radius: 10px;
 }
 
 #touchPad .middle-row {
@@ -327,13 +354,16 @@ button:active {
 
 .modal {
     position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px 10px;
-    z-index: 20;
+    padding: 20px;
+    z-index: 50;
 }
 
 .modal.hidden {
@@ -341,12 +371,13 @@ button:active {
 }
 
 .modal-card {
-    width: min(700px, 95%);
-    background: rgba(8, 15, 24, 0.95);
-    border-radius: 24px;
-    padding: 26px 30px;
+    width: 90%;
+    max-width: 640px;
+    background: rgba(4, 12, 24, 0.96);
+    border-radius: 20px;
     border: 1px solid rgba(126, 243, 255, 0.2);
-    max-height: 90vh;
+    padding: 24px 28px;
+    max-height: 90%;
     overflow-y: auto;
 }
 
@@ -354,17 +385,16 @@ button:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .modal-card .close {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-size: 1.4rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text);
 }
 
 .card-grid {
@@ -374,10 +404,10 @@ button:active {
 }
 
 .character-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px;
     border-radius: 16px;
-    padding: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -388,18 +418,15 @@ button:active {
     width: 90px;
     height: 90px;
     margin: 0 auto;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #fff5, #fffffff0);
-    position: relative;
+    border-radius: 16px;
 }
 
 .character-card .name {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 16px;
 }
 
 .character-card .price {
-    font-size: 0.85rem;
+    font-size: 12px;
     color: var(--muted);
 }
 
@@ -408,34 +435,35 @@ button:active {
 }
 
 .character-card.owned {
-    border-color: rgba(47, 255, 198, 0.3);
+    border-color: rgba(47, 255, 198, 0.5);
 }
 
-.modal .settings-group {
+.settings-group {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 }
 
-.modal .settings-group label {
+.settings-group label {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    font-weight: 600;
 }
 
-.modal select {
-    border-radius: 12px;
+.settings-group select {
+    border-radius: 10px;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    font-family: "EightBitWonder", sans-serif;
+    font-size: 12px;
 }
 
 .switch {
     position: relative;
-    padding-left: 50px;
+    padding-left: 52px;
 }
 
 .switch input {
@@ -446,38 +474,44 @@ button:active {
     position: absolute;
     left: 0;
     top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
+    width: 48px;
     height: 22px;
+    border-radius: 20px;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 999px;
+    transform: translateY(-50%);
 }
 
 .slider::after {
     content: "";
     position: absolute;
-    width: 18px;
-    height: 18px;
-    background: #fff;
-    border-radius: 50%;
     top: 2px;
     left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
     transition: transform 0.2s ease;
-}
-
-.switch input:checked + .slider::after {
-    transform: translateX(18px);
 }
 
 .switch input:checked + .slider {
     background: var(--accent-strong);
 }
 
+.switch input:checked + .slider::after {
+    transform: translateX(26px);
+}
+
+.crossy-road-text {
+    font-family: "CrossyRoad", "EightBitWonder", sans-serif;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0px #000000, 4px 4px 0px rgba(0, 0, 0, 0.6);
+}
+
 #fireworksLayer span {
     position: absolute;
     width: 4px;
     height: 20px;
-    background: linear-gradient(180deg, #fff, rgba(255, 255, 255, 0));
+    background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0));
     animation: explode 1.2s ease-out forwards;
 }
 
@@ -508,12 +542,12 @@ button:active {
 }
 
 @media (max-width: 900px) {
+    .app-frame {
+        padding: 12px;
+    }
     .hud {
         flex-direction: column;
-        gap: 12px;
-    }
-    .hud-stats {
-        justify-content: center;
+        align-items: flex-start;
     }
     #touchPad {
         display: flex;

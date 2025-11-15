@@ -64,7 +64,12 @@ const I18N = {
         eagleReady: "The eagle is swooping in!",
         buy: "Buy",
         characterActive: "Current",
-        tap: "Tap"
+        tap: "Tap",
+        pressKey: "Press any key to start",
+        pause: "Pause",
+        resume: "Resume",
+        paused: "Game paused",
+        newBestRun: "New run record! {score}"
     },
     ko: {
         title: "Crossing Friends",
@@ -108,7 +113,12 @@ const I18N = {
         eagleReady: "독수리가 가까워졌어요!",
         buy: "구매",
         characterActive: "현재",
-        tap: "탭"
+        tap: "탭",
+        pressKey: "아무 키나 눌러 시작",
+        pause: "일시정지",
+        resume: "계속하기",
+        paused: "게임이 일시정지되었습니다.",
+        newBestRun: "새 기록! {score}점"
     }
 };
 
@@ -162,7 +172,8 @@ const dom = {
     characterList: document.getElementById("characterList"),
     languageSelect: document.getElementById("languageSelect"),
     audioToggle: document.getElementById("audioToggle"),
-    shadowToggle: document.getElementById("shadowToggle")
+    shadowToggle: document.getElementById("shadowToggle"),
+    pauseButton: document.getElementById("pauseButton")
 };
 
 const state = {
@@ -189,6 +200,10 @@ let cameraY = 0;
 let lastTimestamp = 0;
 let gameRunning = false;
 let eagleSounded = false;
+let paused = false;
+let runFireworksShown = false;
+let pendingBestScore = null;
+let pendingBestRow = null;
 
 let sound;
 
@@ -310,6 +325,8 @@ function setupUI() {
         persistSave();
     });
 
+    dom.pauseButton.addEventListener("click", () => togglePause());
+
     document.querySelectorAll(".modal").forEach(modal => {
         modal.addEventListener("click", evt => {
             if (evt.target === modal) {
@@ -327,6 +344,20 @@ function setupUI() {
             closeModal(dom.settingsModal);
             return;
         }
+        const canStart = dom.startScreen.classList.contains("visible") &&
+            dom.characterModal.classList.contains("hidden") &&
+            dom.settingsModal.classList.contains("hidden") &&
+            !gameRunning;
+        if (canStart) {
+            evt.preventDefault();
+            startGame();
+            return;
+        }
+        if (evt.code === "Space" && gameRunning) {
+            evt.preventDefault();
+            togglePause();
+            return;
+        }
         handleKey(evt);
     });
 
@@ -338,6 +369,7 @@ function setupUI() {
 
     updateCharacterList();
     updateSelectedCharacterDisplay();
+    dom.pauseButton.disabled = true;
 }
 
 function startGame() {
@@ -346,6 +378,13 @@ function startGame() {
     dom.startScreen.classList.add("hidden");
     dom.startScreen.classList.remove("visible");
     dom.deathScreen.classList.add("hidden");
+    paused = false;
+    pendingBestScore = null;
+    pendingBestRow = null;
+    runFireworksShown = false;
+    dom.pauseButton.disabled = false;
+    dom.pauseButton.textContent = t("pause");
+    dom.idleWarning.classList.add("hidden");
     resetWorld();
     gameRunning = true;
     eagleSounded = false;
@@ -353,6 +392,11 @@ function startGame() {
 }
 
 function resetWorld() {
+    pendingBestScore = null;
+    pendingBestRow = null;
+    runFireworksShown = false;
+    paused = false;
+    dom.idleWarning.classList.add("hidden");
     rows = [];
     rowMap.clear();
     highestRow = -1;
@@ -389,7 +433,8 @@ function createPlayer() {
         eagleTimer: 0,
         eagleTriggered: false,
         appearance: character.colors,
-        alive: true
+        alive: true,
+        deathAnimation: null
     };
 }
 
@@ -525,8 +570,21 @@ function handleDirection(direction) {
     attemptMove(delta.x, delta.y);
 }
 
+function togglePause() {
+    if (!gameRunning || !player || !player.alive) return;
+    paused = !paused;
+    dom.pauseButton.textContent = paused ? t("resume") : t("pause");
+    if (paused) {
+        announce(t("paused"));
+    } else {
+        player.lastMoveTime = performance.now();
+        dom.idleWarning.classList.add("hidden");
+        announce(t("helper"));
+    }
+}
+
 function attemptMove(dx, dy) {
-    if (!gameRunning || player.moving || !player.alive) return;
+    if (!gameRunning || paused || player.moving || !player.alive) return;
     const targetX = clamp(player.gridX + dx, 0, GRID_WIDTH - 1);
     const targetY = Math.max(0, player.gridY + dy);
     if (targetX === player.gridX && targetY === player.gridY) return;
@@ -536,6 +594,7 @@ function attemptMove(dx, dy) {
         announce(t("treeBlock"));
         return;
     }
+    const forwardMove = dy > 0;
 
     player.startX = player.gridX;
     player.startY = player.gridY;
@@ -550,11 +609,11 @@ function attemptMove(dx, dy) {
     player.lastMoveTime = performance.now();
     dom.idleWarning.classList.add("hidden");
 
-    state.score += 1;
-    updateScoreDisplays();
+    if (forwardMove) {
+        handleForwardAdvance(targetY);
+    }
     pathHistory.push({ x: targetX, y: targetY });
     if (pathHistory.length > 300) pathHistory.shift();
-    checkBest(targetY);
     sound.play(300, 0.04);
 }
 
@@ -575,19 +634,30 @@ function updateSelectedCharacterDisplay() {
     dom.selectedCharacter.textContent = char.names[state.language];
 }
 
-function checkBest(targetRow) {
+function handleForwardAdvance(rowIndex) {
+    state.score += 1;
+    updateScoreDisplays();
     if (state.score > state.bestScore) {
-        state.bestScore = state.score;
-        state.bestRow = targetRow;
-        state.save.bestScore = state.bestScore;
-        state.save.bestRow = targetRow;
-        addFloatingText(t("pbOnPath", { score: state.score }), player.targetX, player.targetY + 0.3);
-        spawnFireworks();
-        announce(t("newBest", { score: state.score }));
-        sound.play(620, 0.18);
-        persistSave();
-        updateScoreDisplays();
+        if (!runFireworksShown) {
+            addFloatingText(t("pbOnPath", { score: state.score }), player.targetX, rowIndex + 0.3);
+            spawnFireworks();
+            announce(t("newBestRun", { score: state.score }));
+            sound.play(620, 0.18);
+            runFireworksShown = true;
+        }
+        pendingBestScore = state.score;
+        pendingBestRow = rowIndex;
     }
+}
+
+function finalizeRunBest() {
+    if (pendingBestScore && pendingBestScore > state.bestScore) {
+        state.bestScore = pendingBestScore;
+        state.bestRow = pendingBestRow ?? state.bestRow;
+    }
+    pendingBestScore = null;
+    pendingBestRow = null;
+    runFireworksShown = false;
 }
 
 function updateHUD() {
@@ -689,7 +759,8 @@ function gameLoop(timestamp) {
     const delta = Math.min((timestamp - lastTimestamp) / 1000, 0.12);
     lastTimestamp = timestamp;
 
-    if (gameRunning && player.alive) {
+    const active = gameRunning && player.alive && !paused;
+    if (active) {
         ensureFutureRows(player.gridY + 30);
         trimRows(player.gridY - 20);
         updateWorld(delta);
@@ -698,8 +769,12 @@ function gameLoop(timestamp) {
         updateFloatingTexts(delta);
         handleIdleState(timestamp, delta);
         updateCamera(delta);
-    } else {
+    } else if (!paused) {
         updateFloatingTexts(delta);
+    }
+
+    if (!paused) {
+        updateDeathAnimation(delta);
     }
 
     render();
@@ -867,6 +942,21 @@ function updateFloatingTexts(dt) {
     floatingTexts = floatingTexts.filter(text => text.life > 0);
 }
 
+function updateDeathAnimation(dt) {
+    if (!player || !player.deathAnimation) return;
+    player.deathAnimation.progress = Math.min(1, player.deathAnimation.progress + dt / player.deathAnimation.duration);
+}
+
+function createDeathAnimation(reason) {
+    return {
+        type: reason,
+        progress: 0,
+        duration: reason === "water" ? 0.9 : 0.7,
+        x: player.visualX,
+        y: player.visualY
+    };
+}
+
 function handleIdleState(timestamp, dt) {
     const idleDuration = timestamp - player.lastMoveTime;
     if (idleDuration > IDLE_WARNING && idleDuration < IDLE_LIMIT) {
@@ -926,10 +1016,16 @@ function killPlayer(reason) {
     if (!player.alive) return;
     player.alive = false;
     gameRunning = false;
+    paused = false;
+    player.deathAnimation = createDeathAnimation(reason);
+    finalizeRunBest();
+    dom.pauseButton.disabled = true;
+    dom.pauseButton.textContent = t("pause");
+    dom.idleWarning.classList.add("hidden");
     dom.deathScreen.classList.remove("hidden");
     dom.deathReason.textContent = t(`death_${reason}`) || t("death_unknown");
     dom.finalScore.textContent = state.score;
-    updateSelectedCharacterDisplay();
+    updateScoreDisplays();
     persistSave();
 }
 
@@ -1058,6 +1154,11 @@ function drawWarningLights(row, offsetX, screenY) {
 }
 
 function drawPlayer(offsetX) {
+    if (!player) return;
+    if (!player.alive && player.deathAnimation) {
+        drawDeathAnimation(offsetX);
+        return;
+    }
     const { visualX, visualY, appearance } = player;
     const x = offsetX + visualX * TILE_SIZE;
     const y = worldToScreenY(visualY * TILE_SIZE);
@@ -1066,6 +1167,62 @@ function drawPlayer(offsetX) {
         ctx.fillStyle = "#f7d794";
         ctx.beginPath();
         ctx.arc(x + TILE_SIZE * 0.5, y - TILE_SIZE * 0.2, TILE_SIZE * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function drawDeathAnimation(offsetX) {
+    if (!player.deathAnimation) return;
+    const anim = player.deathAnimation;
+    const baseX = offsetX + anim.x * TILE_SIZE;
+    const baseY = worldToScreenY(anim.y * TILE_SIZE);
+    const centerX = baseX + TILE_SIZE / 2;
+    const centerY = baseY + TILE_SIZE / 2;
+    const progress = anim.progress;
+    if (anim.type === "water") {
+        const radius = TILE_SIZE * (0.35 + progress * 0.8);
+        ctx.strokeStyle = `rgba(126, 243, 255, ${Math.max(0, 1 - progress)})`;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = `rgba(126, 243, 255, ${0.5 - progress * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, TILE_SIZE * 0.2 * (1 - progress * 0.4), 0, Math.PI * 2);
+        ctx.fill();
+        return;
+    }
+    if (anim.type === "idle" || anim.type === "edge") {
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, 1 - progress)})`;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY - TILE_SIZE * progress, TILE_SIZE * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.4 - progress * 0.3})`;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY - TILE_SIZE * progress * 1.2, TILE_SIZE * 0.45, 0, Math.PI * 2);
+        ctx.stroke();
+        return;
+    }
+    ctx.save();
+    ctx.translate(centerX, baseY + TILE_SIZE * 0.65);
+    const squash = Math.max(0.2, 1 - progress);
+    ctx.scale(1, squash);
+    ctx.fillStyle = anim.type === "train" ? "#ff8b5f" : "#fddc5c";
+    ctx.fillRect(-TILE_SIZE * 0.35, -TILE_SIZE * 0.2, TILE_SIZE * 0.7, TILE_SIZE * 0.4);
+    ctx.restore();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+    ctx.fillRect(centerX - TILE_SIZE * 0.45, baseY + TILE_SIZE * 0.3, TILE_SIZE * 0.9, 4);
+    if (anim.type === "train") {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.beginPath();
+        ctx.moveTo(centerX - TILE_SIZE * 0.2, baseY + TILE_SIZE * 0.1);
+        ctx.lineTo(centerX - TILE_SIZE * 0.35, baseY - TILE_SIZE * 0.05);
+        ctx.lineTo(centerX - TILE_SIZE * 0.1, baseY);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(centerX + TILE_SIZE * 0.2, baseY + TILE_SIZE * 0.05);
+        ctx.lineTo(centerX + TILE_SIZE * 0.38, baseY - TILE_SIZE * 0.1);
+        ctx.lineTo(centerX + TILE_SIZE * 0.12, baseY - TILE_SIZE * 0.04);
         ctx.fill();
     }
 }
@@ -1092,7 +1249,7 @@ function drawVoxelCharacter(x, y, colors, scale = 1) {
 function drawFloatingTexts(offsetX) {
     ctx.save();
     ctx.textAlign = "center";
-    ctx.font = `${Math.round(TILE_SIZE * 0.35)}px "Pretendard", "Segoe UI", sans-serif`;
+    ctx.font = `${Math.round(TILE_SIZE * 0.32)}px "CrossyRoad", "EightBitWonder", sans-serif`;
     floatingTexts.forEach(text => {
         const alpha = clamp(text.life / 2000, 0, 1);
         ctx.globalAlpha = alpha;
@@ -1114,7 +1271,7 @@ function drawBestMarker(offsetX) {
     ctx.fillStyle = "rgba(255,255,255,0.08)";
     ctx.fillRect(offsetX, screenY, GRID_WIDTH * TILE_SIZE, TILE_SIZE);
     ctx.fillStyle = "#fff";
-    ctx.font = `${Math.round(TILE_SIZE * 0.35)}px "Segoe UI", sans-serif`;
+    ctx.font = `${Math.round(TILE_SIZE * 0.32)}px "EightBitWonder", sans-serif`;
     ctx.textAlign = "center";
     ctx.fillText(t("pbOnPath", { score: state.bestScore }), offsetX + (GRID_WIDTH * TILE_SIZE) / 2, screenY + TILE_SIZE * 0.7);
     ctx.restore();
@@ -1143,6 +1300,7 @@ function updateI18n() {
         const label = el.querySelector(".label");
         if (label) label.textContent = t(key);
     });
+    dom.pauseButton.textContent = paused ? t("resume") : t("pause");
     document.documentElement.lang = state.language;
     announce(t("helper"));
     updateSelectedCharacterDisplay();
