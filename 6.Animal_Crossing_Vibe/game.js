@@ -63,6 +63,9 @@
   var characterListElement = null;
   var openCharacterButton = null;
   var closeCharacterButton = null;
+  var retryButton = null;
+  var retryOverlayButton = null;
+  var gameOverOverlay = null;
 
   // -----------------------------
   // Bootstrapping
@@ -90,6 +93,9 @@
     characterListElement = document.getElementById("characterList");
     openCharacterButton = document.getElementById("openCharacterPanel");
     closeCharacterButton = document.getElementById("closeCharacterPanel");
+    retryButton = document.getElementById("retryButton");
+    retryOverlayButton = document.getElementById("retryOverlayButton");
+    gameOverOverlay = document.getElementById("gameOverOverlay");
   }
 
   function setupCanvas() {
@@ -144,6 +150,7 @@
   // Initialization helpers
   // -----------------------------
   function resetGame() {
+    hideGameOverOverlay();
     player = createPlayer();
     initGameRows();
     furthestRow = player.row;
@@ -307,11 +314,16 @@
   }
 
   function bindRetryButton() {
-    var retryButton = document.querySelector(".button-bar button");
-    if (!retryButton) {
-      return;
+    var handler = function () {
+      hideGameOverOverlay();
+      resetGame();
+    };
+    if (retryButton) {
+      retryButton.addEventListener("click", handler);
     }
-    retryButton.addEventListener("click", resetGame);
+    if (retryOverlayButton) {
+      retryOverlayButton.addEventListener("click", handler);
+    }
   }
 
   function bindCharacterPanelControls() {
@@ -392,7 +404,9 @@
       row.spawnTimer -= deltaTime;
       if (row.spawnTimer <= 0) {
         spawnCar(row.index);
-        row.spawnTimer = randomBetween(row.laneConfig.spawnIntervalMin, row.laneConfig.spawnIntervalMax);
+        row.spawnTimer =
+          randomBetween(row.laneConfig.spawnIntervalMin, row.laneConfig.spawnIntervalMax) /
+          getDifficultyMultiplier();
       }
 
       row.cars = row.cars.filter(function (car) {
@@ -420,7 +434,9 @@
       row.spawnTimer -= deltaTime;
       if (row.spawnTimer <= 0) {
         spawnLog(row.index);
-        row.spawnTimer = randomBetween(row.laneConfig.spawnIntervalMin, row.laneConfig.spawnIntervalMax);
+        row.spawnTimer =
+          randomBetween(row.laneConfig.spawnIntervalMin, row.laneConfig.spawnIntervalMax) /
+          getDifficultyMultiplier();
       }
 
       row.logs = row.logs.filter(function (log) {
@@ -460,7 +476,7 @@
     row.cars.push({
       row: rowIndex,
       x: startX,
-      speed: row.laneConfig.baseSpeed,
+      speed: row.laneConfig.baseSpeed * getDifficultyMultiplier(),
       direction: direction,
       lengthTiles: CAR_LENGTH_TILES,
     });
@@ -478,7 +494,7 @@
     row.logs.push({
       row: rowIndex,
       x: startX,
-      speed: row.laneConfig.baseSpeed,
+      speed: row.laneConfig.baseSpeed * getDifficultyMultiplier(),
       direction: direction,
       lengthTiles: LOG_LENGTH_TILES,
     });
@@ -530,6 +546,7 @@
       saveData.currentCharacter = DEFAULT_SAVE_DATA.currentCharacter;
     }
     saveGameData(saveData);
+    showGameOverOverlay();
   }
 
   // -----------------------------
@@ -702,6 +719,12 @@
     return Math.random() * (max - min) + min;
   }
 
+  function getDifficultyMultiplier() {
+    var distanceScore = Math.max(score, 0);
+    var capped = Math.min(distanceScore, 40);
+    return 1 + capped * 0.03;
+  }
+
   function getRandomSafeRowIndex() {
     var safeRows = mapRows.filter(function (row) {
       return row.rowType !== "river";
@@ -711,6 +734,18 @@
     }
     var choice = safeRows[Math.floor(Math.random() * safeRows.length)];
     return choice.index;
+  }
+
+  function showGameOverOverlay() {
+    if (gameOverOverlay) {
+      gameOverOverlay.classList.add("visible");
+    }
+  }
+
+  function hideGameOverOverlay() {
+    if (gameOverOverlay) {
+      gameOverOverlay.classList.remove("visible");
+    }
   }
 
   function loadGameData() {

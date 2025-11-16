@@ -19,7 +19,14 @@
         </div>
       </header>
 
-      <canvas id="gameCanvas"></canvas>
+      <section class="canvas-wrapper">
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-over-overlay" id="gameOverOverlay">
+          <h2>Game Over</h2>
+          <p>Watch your step next time!</p>
+          <button type="button" id="retryOverlayButton">Retry</button>
+        </div>
+      </section>
 
       <section class="character-panel hidden" id="characterPanel">
         <header>
@@ -30,7 +37,7 @@
       </section>
 
       <footer class="button-bar">
-        <button type="button">Retry</button>
+        <button type="button" id="retryButton">Retry</button>
         <button type="button" id="openCharacterPanel">Characters</button>
         <button type="button">Options</button>
       </footer>
