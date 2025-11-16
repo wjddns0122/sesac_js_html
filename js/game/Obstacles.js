@@ -1,20 +1,18 @@
 (function () {
-  const VEHICLES = [
-    { length: 1.5, color: '#ff6f61' },
-    { length: 2.2, color: '#fdd835' },
-    { length: 3.2, color: '#8d6e63' }
-  ];
+  const VEHICLE_SPECS = {
+    CAR: { length: 1.1, color: '#ff6f61' },
+    TRUCK: { length: 1.8, color: '#fdd835' },
+    BUS: { length: 2.6, color: '#8d6e63' }
+  };
+
+  const LOG_SPECS = {
+    LOG_SHORT: { length: 1.6 },
+    LOG_MED: { length: 2.4 },
+    LOG_LONG: { length: 3.2 }
+  };
 
   function random(min, max) {
     return Math.random() * (max - min) + min;
-  }
-
-  function createStaticObstacles(density) {
-    const tiles = [];
-    for (let x = 0; x < Config.virtualWidth; x += 1) {
-      if (Math.random() < density) tiles.push(x);
-    }
-    return tiles;
   }
 
   function createCoins(pattern) {
@@ -30,35 +28,102 @@
     return coins;
   }
 
-  function createVehicles(direction, difficulty) {
-    const entries = [];
-    let cursor = -5 + Math.random() * 2;
-    while (cursor < Config.virtualWidth + 6) {
-      const type = VEHICLES[Math.floor(Math.random() * VEHICLES.length)];
-      entries.push({ x: cursor, length: type.length, color: type.color });
-      cursor += type.length + random(1.2 - difficulty.gapModifier, 3.5 - difficulty.gapModifier * 0.5);
+  function createGrassBlocks({ density, corridorX, minEmpty }) {
+    const blocked = new Array(Config.virtualWidth).fill(false);
+    for (let x = 0; x < Config.virtualWidth; x += 1) {
+      if (Math.abs(x - corridorX) <= 1) continue;
+      if (Math.random() < density) blocked[x] = true;
     }
-    const speed = random(3, 6) * difficulty.speedMultiplier * direction;
-    return { objects: entries, speed };
+    let emptyCount = blocked.reduce((count, isBlocked) => count + (isBlocked ? 0 : 1), 0);
+    if (emptyCount < minEmpty) {
+      for (let x = 0; x < blocked.length && emptyCount < minEmpty; x += 1) {
+        if (blocked[x]) {
+          blocked[x] = false;
+          emptyCount += 1;
+        }
+      }
+    }
+    return blocked.reduce((arr, isBlocked, index) => {
+      if (isBlocked) arr.push(index);
+      return arr;
+    }, []);
   }
 
-  function createLogs(direction, difficulty) {
+  function createRoadPattern(pattern, direction, speedMultiplier) {
+    const slotSpacing = Config.ROAD_SLOT_SPACING;
+    const wrapLength = pattern.slots.length * slotSpacing + Config.virtualWidth + 6;
+    const startX = direction > 0 ? -wrapLength / 2 : Config.virtualWidth + wrapLength / 2;
+    const vehicles = [];
+    pattern.slots.forEach((slot, index) => {
+      if (slot === 'GAP') return;
+      const spec = VEHICLE_SPECS[slot] || VEHICLE_SPECS.CAR;
+      const offset = index * slotSpacing;
+      const x = direction > 0 ? startX + offset : startX - offset;
+      vehicles.push({
+        x,
+        length: spec.length,
+        color: spec.color
+      });
+    });
+    const baseSpeed = pattern.baseSpeed * speedMultiplier;
+    const wrapStart = -wrapLength;
+    const wrapEnd = Config.virtualWidth + wrapLength;
+    return {
+      vehicles,
+      speed: baseSpeed * direction,
+      wrapStart,
+      wrapEnd,
+      wrapSpan: wrapEnd - wrapStart
+    };
+  }
+
+  function updateRoadLane(lane, dt) {
+    lane.vehicles.forEach((vehicle) => {
+      vehicle.x += lane.speed * dt;
+      if (lane.speed > 0 && vehicle.x > lane.wrapEnd) {
+        vehicle.x -= lane.wrapSpan;
+      } else if (lane.speed < 0 && vehicle.x < lane.wrapStart - vehicle.length) {
+        vehicle.x += lane.wrapSpan;
+      }
+    });
+  }
+
+  function createRiverPattern(pattern, direction, speedMultiplier) {
+    const slotSpacing = Config.RIVER_SLOT_SPACING;
+    const wrapLength = pattern.slots.length * slotSpacing + Config.virtualWidth + 6;
+    const startX = direction > 0 ? -wrapLength / 2 : Config.virtualWidth + wrapLength / 2;
     const logs = [];
-    let cursor = -6;
-    while (cursor < Config.virtualWidth + 6) {
-      const length = random(1.5, 3.8);
-      logs.push({ x: cursor, length, color: '#8d6e63' });
-      cursor += length + random(1.5 - difficulty.gapModifier, 3 - difficulty.gapModifier * 0.5);
-    }
-    const speed = random(1.4, 3.2) * difficulty.speedMultiplier * direction;
-    return { objects: logs, speed };
+    pattern.slots.forEach((slot, index) => {
+      if (slot === 'GAP') return;
+      const spec = LOG_SPECS[slot] || LOG_SPECS.LOG_MED;
+      const offset = index * slotSpacing;
+      const x = direction > 0 ? startX + offset : startX - offset;
+      logs.push({
+        x,
+        length: spec.length,
+        color: Config.palette.logBody
+      });
+    });
+    const baseSpeed = pattern.baseSpeed * speedMultiplier;
+    const wrapStart = -wrapLength;
+    const wrapEnd = Config.virtualWidth + wrapLength;
+    return {
+      logs,
+      speed: baseSpeed * direction,
+      wrapStart,
+      wrapEnd,
+      wrapSpan: wrapEnd - wrapStart
+    };
   }
 
-  function updateLinear(list, speed, dt) {
-    list.forEach((obj) => {
-      obj.x += speed * dt;
-      if (speed > 0 && obj.x > Config.virtualWidth + 3) obj.x = -obj.length - 2;
-      if (speed < 0 && obj.x < -obj.length - 3) obj.x = Config.virtualWidth + 2;
+  function updateRiverLane(lane, dt) {
+    lane.logs.forEach((log) => {
+      log.x += lane.speed * dt;
+      if (lane.speed > 0 && log.x > lane.wrapEnd) {
+        log.x -= lane.wrapSpan;
+      } else if (lane.speed < 0 && log.x < lane.wrapStart - log.length) {
+        log.x += lane.wrapSpan;
+      }
     });
   }
 
@@ -105,11 +170,12 @@
   }
 
   window.Obstacles = {
-    createStaticObstacles,
     createCoins,
-    createVehicles,
-    createLogs,
-    updateLinear,
+    createGrassBlocks,
+    createRoadPattern,
+    updateRoadLane,
+    createRiverPattern,
+    updateRiverLane,
     initRailData,
     updateRail,
     removeCoin
