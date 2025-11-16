@@ -83,9 +83,9 @@
 
   function update(deltaTime) {
     updateCars(deltaTime);
-    updateLogs(deltaTime);
+    var playerOnLog = updateLogs(deltaTime);
     checkCollision();
-    // checkDrowning(); // placeholder for next milestone
+    checkDrowning(playerOnLog);
   }
 
   function render() {
@@ -254,7 +254,46 @@
   }
 
   function updateLogs(deltaTime) {
-    // placeholder: will manage log spawn and movement similar to cars
+    if (!mapRows.length) {
+      return false;
+    }
+
+    var playerOnLog = false;
+
+    mapRows.forEach(function (row) {
+      if (row.rowType !== "river" || !row.laneConfig) {
+        return;
+      }
+
+      row.spawnTimer -= deltaTime;
+      if (row.spawnTimer <= 0) {
+        spawnLog(row.index);
+        row.spawnTimer = randomBetween(row.laneConfig.spawnIntervalMin, row.laneConfig.spawnIntervalMax);
+      }
+
+      row.logs = row.logs.filter(function (log) {
+        log.x += log.speed * log.direction * deltaTime;
+
+        var leftBound = log.x + log.lengthTiles < 0 && log.direction < 0;
+        var rightBound = log.x - log.lengthTiles > GRID_COLS && log.direction > 0;
+
+        if (!(leftBound || rightBound) && player.row === row.index) {
+          var playerLeft = player.col;
+          var playerRight = player.col + 1;
+          if (playerRight > log.x && playerLeft < log.x + log.lengthTiles) {
+            playerOnLog = true;
+            player.col += log.speed * log.direction * deltaTime;
+          }
+        }
+
+        return !(leftBound || rightBound);
+      });
+    });
+
+    // Keep the player within grid bounds even after being carried
+    player.col = Math.max(0, Math.min(GRID_COLS - 1, player.col));
+
+    return playerOnLog;
   }
 
   function spawnCar(rowIndex) {
@@ -276,11 +315,32 @@
   }
 
   function spawnLog(rowIndex) {
-    // placeholder: next milestone logic similar to spawnCar but for river lanes
+    var row = mapRows[rowIndex];
+    if (!row || row.rowType !== "river" || !row.laneConfig) {
+      return;
+    }
+
+    var direction = row.laneConfig.direction;
+    var startX = direction > 0 ? -LOG_LENGTH_TILES : GRID_COLS + LOG_LENGTH_TILES;
+
+    row.logs.push({
+      row: rowIndex,
+      x: startX,
+      speed: row.laneConfig.baseSpeed,
+      direction: direction,
+      lengthTiles: LOG_LENGTH_TILES,
+    });
   }
 
-  function checkDrowning() {
-    // placeholder: ensure player stands on a log when on river rows
+  function checkDrowning(isOnLog) {
+    var row = mapRows[player.row];
+    if (!row || row.rowType !== "river") {
+      return;
+    }
+
+    if (!isOnLog) {
+      triggerGameOver();
+    }
   }
 
   function checkCollision() {
