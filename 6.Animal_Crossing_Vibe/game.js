@@ -5,11 +5,16 @@
   var GRID_COLS = 15;
   var GRID_ROWS = 20;
   var BG_COLOR = "#b9fbc0";
+  var CAR_BASE_SPEED = 4; // base tiles per second
+  var CAR_LENGTH_TILES = 1.5;
+  var SPAWN_INTERVAL_MIN = 1.2;
+  var SPAWN_INTERVAL_MAX = 2.6;
 
   var canvas = null;
   var ctx = null;
   var player = null;
   var mapRows = [];
+  var lastTimestamp = 0;
 
   document.addEventListener("DOMContentLoaded", function () {
     canvas = document.getElementById("gameCanvas");
@@ -28,7 +33,15 @@
     canvas.height = GRID_ROWS * TILE_SIZE;
   }
 
-  function gameLoop() {
+  function gameLoop(timestamp) {
+    if (!lastTimestamp) {
+      lastTimestamp = timestamp;
+    }
+
+    var deltaTime = (timestamp - lastTimestamp) / 1000;
+    lastTimestamp = timestamp;
+
+    updateCars(deltaTime);
     render();
     window.requestAnimationFrame(gameLoop);
   }
@@ -40,6 +53,7 @@
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     renderRows(ctx);
     renderGrid(ctx);
+    renderCars(ctx);
     renderPlayer(ctx, player);
   }
 
@@ -62,9 +76,9 @@
         type = "road";
         laneConfig = {
           direction: rowIndex % 2 === 0 ? 1 : -1,
-          baseSpeed: 70 + (rowIndex % 3) * 10,
-          spawnIntervalMin: 1.2,
-          spawnIntervalMax: 2.6,
+          baseSpeed: CAR_BASE_SPEED + (rowIndex % 3) * 0.8,
+          spawnIntervalMin: SPAWN_INTERVAL_MIN,
+          spawnIntervalMax: SPAWN_INTERVAL_MAX,
         };
       }
 
@@ -80,7 +94,7 @@
       rowType: type,
       cars: [],
       laneConfig: config,
-      spawnTimer: 0,
+      spawnTimer: config ? randomBetween(config.spawnIntervalMin, config.spawnIntervalMax) : 0,
     };
   }
 
@@ -129,6 +143,26 @@
     context.fillRect(pixelX + 6, pixelY + 6, TILE_SIZE - 12, TILE_SIZE - 12);
   }
 
+  function renderCars(context) {
+    mapRows.forEach(function (row) {
+      if (row.rowType !== "road") {
+        return;
+      }
+
+      row.cars.forEach(function (car) {
+        // Translate tile-space x/y into pixel positions
+        var pixelX = car.x * TILE_SIZE;
+        var pixelY = car.row * TILE_SIZE + 6;
+        var width = car.lengthTiles * TILE_SIZE;
+        var height = TILE_SIZE - 12;
+        context.fillStyle = "#ffb347";
+        context.fillRect(pixelX, pixelY, width, height);
+        context.strokeStyle = "rgba(0,0,0,0.3)";
+        context.strokeRect(pixelX, pixelY, width, height);
+      });
+    });
+  }
+
   function bindInputs() {
     document.addEventListener("keydown", function (event) {
       var handled = handleMovementInput(event.key);
@@ -166,5 +200,61 @@
     player.row = Math.max(0, Math.min(GRID_ROWS - 1, nextRow));
     player.col = Math.max(0, Math.min(GRID_COLS - 1, nextCol));
     return true;
+  }
+
+  function updateCars(deltaTime) {
+    if (!mapRows.length) {
+      return;
+    }
+
+    mapRows.forEach(function (row) {
+      if (row.rowType !== "road" || !row.laneConfig) {
+        return;
+      }
+
+      // Countdown until a new vehicle should spawn
+      row.spawnTimer -= deltaTime;
+      if (row.spawnTimer <= 0) {
+        spawnCar(row.index);
+        row.spawnTimer = randomBetween(row.laneConfig.spawnIntervalMin, row.laneConfig.spawnIntervalMax);
+      }
+
+      // Move each car and filter out the ones that left the screen
+      row.cars = row.cars.filter(function (car) {
+        car.x += car.speed * car.direction * deltaTime;
+
+        // Remove once the entire car is beyond the opposing edge
+        if (car.direction > 0 && car.x - car.lengthTiles > GRID_COLS) {
+          return false;
+        }
+        if (car.direction < 0 && car.x + car.lengthTiles < 0) {
+          return false;
+        }
+        return true;
+      });
+    });
+  }
+
+  function spawnCar(rowIndex) {
+    var row = mapRows[rowIndex];
+    if (!row || row.rowType !== "road" || !row.laneConfig) {
+      return;
+    }
+
+    var direction = row.laneConfig.direction;
+    // start just off-screen to create smooth entry
+    var startX = direction > 0 ? -CAR_LENGTH_TILES : GRID_COLS + CAR_LENGTH_TILES;
+
+    row.cars.push({
+      row: rowIndex,
+      x: startX,
+      speed: row.laneConfig.baseSpeed,
+      direction: direction,
+      lengthTiles: CAR_LENGTH_TILES,
+    });
+  }
+
+  function randomBetween(min, max) {
+    return Math.random() * (max - min) + min;
   }
 })();
