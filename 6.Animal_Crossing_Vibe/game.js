@@ -11,6 +11,12 @@
     unlockedCharacters: ["villager"],
     currentCharacter: "villager",
   };
+  var CHARACTER_LIBRARY = {
+    villager: { label: "Villager", color: "#ff6f91" },
+    chicken: { label: "Chicken", color: "#ffe66d" },
+    duck: { label: "Duck", color: "#81b29a" },
+    robot: { label: "Robot", color: "#a0aec0" },
+  };
   var TILE_SIZE = 32;
   var GRID_COLS = 15;
   var GRID_ROWS = 20;
@@ -52,6 +58,11 @@
   var coins = [];
   var collectedCoins = 0;
   var saveData = null;
+  var currentCharacter = DEFAULT_SAVE_DATA.currentCharacter;
+  var characterPanel = null;
+  var characterListElement = null;
+  var openCharacterButton = null;
+  var closeCharacterButton = null;
 
   // -----------------------------
   // Bootstrapping
@@ -60,10 +71,13 @@
     cacheDom();
     saveData = loadGameData();
     highScore = saveData.bestScore || 0;
+    currentCharacter = saveData.currentCharacter || DEFAULT_SAVE_DATA.currentCharacter;
     setupCanvas();
     resetGame();
     bindInputs();
     bindRetryButton();
+    bindCharacterPanelControls();
+    renderCharacterPanel();
     window.requestAnimationFrame(gameLoop);
   });
 
@@ -72,6 +86,10 @@
     ctx = canvas.getContext("2d");
     scoreElement = document.getElementById("scoreValue");
     coinElement = document.getElementById("coinValue");
+    characterPanel = document.getElementById("characterPanel");
+    characterListElement = document.getElementById("characterList");
+    openCharacterButton = document.getElementById("openCharacterPanel");
+    closeCharacterButton = document.getElementById("closeCharacterPanel");
   }
 
   function setupCanvas() {
@@ -224,6 +242,58 @@
     return false;
   }
 
+  function renderCharacterPanel() {
+    if (!characterListElement || !saveData) {
+      return;
+    }
+    var unlocked = Array.isArray(saveData.unlockedCharacters) ? saveData.unlockedCharacters : [];
+    var html = Object.keys(CHARACTER_LIBRARY)
+      .map(function (id) {
+        var data = CHARACTER_LIBRARY[id];
+        var isUnlocked = unlocked.indexOf(id) !== -1;
+        var isSelected = currentCharacter === id;
+        return (
+          '<article class="character-card' +
+          (isSelected ? " selected" : "") +
+          '">' +
+          '<div class="character-swatch" style="background:' +
+          data.color +
+          ';"></div>' +
+          "<strong>" +
+          data.label +
+          "</strong>" +
+          "<small>" +
+          (isUnlocked ? (isSelected ? "Equipped" : "Unlocked") : "Locked") +
+          "</small>" +
+          '<button type="button" data-character-id="' +
+          id +
+          '" ' +
+          (isUnlocked && !isSelected ? "" : "disabled") +
+          ">Select</button>" +
+          "</article>"
+        );
+      })
+      .join("");
+    characterListElement.innerHTML = html;
+  }
+
+  function selectCharacter(characterId) {
+    if (!saveData) {
+      return;
+    }
+    if (!CHARACTER_LIBRARY[characterId]) {
+      return;
+    }
+    var unlocked = Array.isArray(saveData.unlockedCharacters) ? saveData.unlockedCharacters : [];
+    if (unlocked.indexOf(characterId) === -1) {
+      return;
+    }
+    currentCharacter = characterId;
+    saveData.currentCharacter = characterId;
+    saveGameData(saveData);
+    renderCharacterPanel();
+  }
+
   // -----------------------------
   // Input handling
   // -----------------------------
@@ -242,6 +312,29 @@
       return;
     }
     retryButton.addEventListener("click", resetGame);
+  }
+
+  function bindCharacterPanelControls() {
+    if (!openCharacterButton || !characterPanel) {
+      return;
+    }
+    openCharacterButton.addEventListener("click", function () {
+      characterPanel.classList.remove("hidden");
+    });
+    if (closeCharacterButton) {
+      closeCharacterButton.addEventListener("click", function () {
+        characterPanel.classList.add("hidden");
+      });
+    }
+    if (characterListElement) {
+      characterListElement.addEventListener("click", function (event) {
+        var button = event.target.closest("button[data-character-id]");
+        if (!button || button.disabled) {
+          return;
+        }
+        selectCharacter(button.getAttribute("data-character-id"));
+      });
+    }
   }
 
   function handleMovementInput(key) {
@@ -534,7 +627,8 @@
     }
     var pixelX = player.col * TILE_SIZE;
     var pixelY = player.row * TILE_SIZE;
-    ctx.fillStyle = "#ff6f91";
+    var palette = CHARACTER_LIBRARY[currentCharacter] || CHARACTER_LIBRARY.villager;
+    ctx.fillStyle = palette.color;
     ctx.fillRect(pixelX + 6, pixelY + 6, TILE_SIZE - 12, TILE_SIZE - 12);
   }
 
