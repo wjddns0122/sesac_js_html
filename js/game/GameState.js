@@ -12,12 +12,16 @@
     runCoins: 0,
     totalCoins: 0,
     highScore: 0,
+    previousHighScore: 0,
     startRow: 0,
     longestRiverChain: 0,
     currentRiverChain: 0,
     lastDeathReason: null,
     dangerLineY: -10,
-    currentWorldId: 'classic'
+    currentWorldId: 'classic',
+    highScoreMarkerRow: null,
+    hasBeatenHighScore: false,
+    pauseStartTime: null
   };
 
   function init() {
@@ -44,6 +48,12 @@
     state.runCoins = 0;
     state.longestRiverChain = 0;
     state.currentRiverChain = 0;
+    state.previousHighScore = StorageApi.getHighScore();
+    state.highScore = state.previousHighScore;
+    state.highScoreMarkerRow = state.previousHighScore > 0 ? state.startRow + state.previousHighScore : null;
+    state.hasBeatenHighScore = false;
+    state.pauseStartTime = null;
+    state.player.lastMoveAt = performance.now();
     state.dangerLineY = state.player.targetY - Config.maxRowsBehind;
   }
 
@@ -137,12 +147,16 @@
     if (delta.dy > 0 && state.player.targetY > state.maxDistance) {
       state.maxDistance = Math.round(state.player.targetY);
       state.score = state.maxDistance - state.startRow;
+      const beatPrevious = state.score > state.previousHighScore;
       if (state.score > state.highScore) {
         state.highScore = state.score;
         StorageApi.setHighScore(state.highScore);
-        bus.emit('new-best', true);
       }
-      bus.emit('score', { score: state.score, highScore: state.highScore });
+      if (beatPrevious && !state.hasBeatenHighScore) {
+        state.hasBeatenHighScore = true;
+        bus.emit('new-best', { newRecord: true, score: state.score });
+      }
+      bus.emit('score', { score: state.score, highScore: state.highScore, newRecord: beatPrevious });
     }
     if (delta.dy > 0) state.dangerLineY += 0.4;
   }
@@ -151,6 +165,7 @@
     state.phase = 'GAMEOVER';
     state.lastDeathReason = reason;
     state.player.isDead = true;
+    state.pauseStartTime = null;
     StorageApi.updateStats({ lastReason: reason });
     Unlocks.checkUnlocks(state);
     bus.emit('gameover', {
@@ -158,9 +173,28 @@
       highScore: state.highScore,
       coins: state.runCoins,
       reason,
-      newHigh: state.score >= state.highScore
+      newHigh: state.score > state.previousHighScore
     });
     emitMeta();
+  }
+
+  function pause() {
+    if (state.phase !== 'PLAYING') return false;
+    state.phase = 'PAUSED';
+    state.pauseStartTime = performance.now();
+    bus.emit('phase', 'PAUSED');
+    return true;
+  }
+
+  function resume() {
+    if (state.phase !== 'PAUSED') return false;
+    const now = performance.now();
+    const pausedDuration = state.pauseStartTime ? now - state.pauseStartTime : 0;
+    state.phase = 'PLAYING';
+    state.pauseStartTime = null;
+    state.player.lastMoveAt += pausedDuration;
+    bus.emit('phase', 'PLAYING');
+    return true;
   }
 
   function updateCamera() {
@@ -182,6 +216,8 @@
     startRun,
     update,
     tryMove,
+    pause,
+    resume,
     bus,
     getState
   };

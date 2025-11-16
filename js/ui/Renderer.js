@@ -2,9 +2,11 @@
   let canvas;
   let ctx;
   let scale = 1;
+  let lastTimestamp = 0;
+  const fireworks = [];
 
-  function init(el) {
-    canvas = el;
+  function init(canvasEl) {
+    canvas = canvasEl;
     ctx = canvas.getContext('2d');
     resize();
     window.addEventListener('resize', resize);
@@ -19,6 +21,9 @@
 
   function render(state) {
     if (!ctx || !state.player) return;
+    const now = performance.now();
+    const dt = lastTimestamp ? (now - lastTimestamp) / 1000 : 0;
+    lastTimestamp = now;
     ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.scale(scale, scale);
@@ -26,6 +31,8 @@
     drawBackground();
     drawLanes(state);
     drawPlayer(state);
+    updateFireworks(dt);
+    drawFireworks(state);
     ctx.restore();
   }
 
@@ -45,6 +52,7 @@
       const y = rowToPixel(lane.worldY, state.cameraY);
       if (y < -Config.tileSize || y > Config.virtualRows * Config.tileSize) return;
       drawLaneBase(lane, y);
+      if (lane.hasBestMarker) drawBestMarker(y);
       drawProps(lane, y);
       drawCoins(lane, y);
       if (lane.type === 'ROAD') drawVehicles(lane, y);
@@ -55,8 +63,20 @@
 
   function drawLaneBase(lane, y) {
     const tile = Config.tileSize;
-    ctx.fillStyle = lane.type === 'GRASS' ? Config.palette.grassBase : lane.type === 'ROAD' ? Config.palette.roadBase : lane.type === 'RIVER' ? Config.palette.riverWater : Config.palette.railBase;
+    const color = lane.type === 'GRASS' ? Config.palette.grassBase : lane.type === 'ROAD' ? Config.palette.roadBase : lane.type === 'RIVER' ? Config.palette.riverWater : Config.palette.railBase;
+    ctx.fillStyle = color;
     ctx.fillRect(0, y, Config.virtualWidth * tile, tile);
+  }
+
+  function drawBestMarker(y) {
+    const tile = Config.tileSize;
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillRect(0, y + tile * 0.25, Config.virtualWidth * tile, tile * 0.5);
+    ctx.fillStyle = '#ffd54f';
+    ctx.font = `${tile * 0.35}px bold sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('BEST', (Config.virtualWidth * tile) / 2, y + tile * 0.5);
   }
 
   function drawProps(lane, y) {
@@ -88,7 +108,7 @@
       ctx.fillStyle = vehicle.color;
       ctx.fillRect(px, y + tile * 0.1, vehicle.length * tile, tile * 0.8);
       ctx.fillStyle = Config.palette.carWindow;
-      ctx.fillRect(px + tile * 0.1, y + tile * 0.25, vehicle.length * tile - tile * 0.2, tile * 0.2);
+      ctx.fillRect(px + tile * 0.1, y + tile * 0.25, Math.max(tile * 0.2, vehicle.length * tile - tile * 0.2), tile * 0.2);
     });
   }
 
@@ -129,10 +149,77 @@
     ctx.fillRect(px - tile * 0.25, py - tile * 0.55, tile * 0.5, tile * 0.4);
   }
 
+  function updateFireworks(dt) {
+    for (let i = fireworks.length - 1; i >= 0; i -= 1) {
+      const burst = fireworks[i];
+      burst.particles.forEach((particle) => {
+        particle.age += dt;
+        particle.x += particle.vx * dt;
+        particle.y += particle.vy * dt;
+        particle.vy -= 1.5 * dt;
+      });
+      burst.particles = burst.particles.filter((p) => p.age < p.life);
+      if (burst.particles.length === 0) fireworks.splice(i, 1);
+    }
+  }
+
+  function drawFireworks(state) {
+    if (!fireworks.length) return;
+    const tile = Config.tileSize;
+    fireworks.forEach((burst) => {
+      burst.particles.forEach((particle) => {
+        const worldX = burst.x + particle.x;
+        const worldY = burst.y + particle.y;
+        const px = worldX * tile + tile * 0.5;
+        const py = rowToPixel(worldY, state.cameraY) + tile * 0.5;
+        ctx.fillStyle = particle.color;
+        ctx.globalAlpha = 1 - particle.age / particle.life;
+        ctx.beginPath();
+        ctx.arc(px, py, tile * 0.08, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+    });
+  }
+
+  function triggerFireworks(state) {
+    if (!state || !state.player) return;
+    for (let i = 0; i < 3; i += 1) {
+      fireworks.push(createFirework(state.player.x + (Math.random() - 0.5) * 0.5, state.player.y + Math.random() * 0.5));
+    }
+  }
+
+  function createFirework(baseX, baseY) {
+    const particles = [];
+    const colors = ['#ffeb3b', '#ff80ab', '#4fc3f7'];
+    for (let i = 0; i < 18; i += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = random(1.5, 3.5);
+      particles.push({
+        x: 0,
+        y: 0,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: random(0.5, 1.2),
+        age: 0,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+    return { x: baseX, y: baseY, particles };
+  }
+
   function rowToPixel(worldY, cameraY) {
     const tile = Config.tileSize;
     return (Config.virtualRows - (worldY - cameraY) - 1) * tile;
   }
 
-  window.Renderer = { init, render };
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  window.Renderer = {
+    init,
+    render,
+    triggerFireworks
+  };
 })();

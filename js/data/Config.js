@@ -16,8 +16,29 @@
     NORMAL_GRASS_OBSTACLE_DENSITY: 0.25,
     SAFE_ZONE_MIN_EMPTY_TILES: 5,
     MIN_EMPTY_TILES_PER_GRASS_ROW: 3,
+    ROAD_PATTERN_LENGTH: 18,
     ROAD_SLOT_SPACING: 1.35,
-    RIVER_SLOT_SPACING: 1.5,
+    ROAD_MIN_GAP_VEHICLE_LENGTHS_EASY: 2.5,
+    ROAD_MIN_GAP_VEHICLE_LENGTHS_MED: 2.0,
+    ROAD_MIN_GAP_VEHICLE_LENGTHS_HARD: 1.5,
+    ROAD_GAP_VARIANCE_EASY: 3,
+    ROAD_GAP_VARIANCE_MED: 2,
+    ROAD_GAP_VARIANCE_HARD: 1,
+    ROAD_BASE_DENSITY_EASY: 0.35,
+    ROAD_BASE_DENSITY_MED: 0.45,
+    ROAD_BASE_DENSITY_HARD: 0.55,
+    ROAD_BASE_SPEED: 2.4,
+    ROAD_SPEED_PER_LEVEL: 0.15,
+    RIVER_PATTERN_LENGTH: 18,
+    RIVER_SLOT_SPACING: 1.4,
+    RIVER_BASE_LOG_DENSITY_EASY: 0.55,
+    RIVER_BASE_LOG_DENSITY_MED: 0.5,
+    RIVER_BASE_LOG_DENSITY_HARD: 0.45,
+    RIVER_MIN_GAP_TILES: 1,
+    RIVER_MAX_GAP_TILES_EASY: 3,
+    RIVER_MAX_GAP_TILES_HARD: 2,
+    RIVER_BASE_SPEED: 1.2,
+    RIVER_SPEED_PER_LEVEL: 0.08,
     palette: {
       backgroundSky: '#5ec6ff',
       backgroundFog: '#0f1530',
@@ -32,36 +53,6 @@
       railBase: '#3a3a3a',
       railTrack: '#c0c0c0',
       uiPanel: '#1f2648cc'
-    },
-    roadPatterns: {
-      easy: [
-        { slots: ['CAR', 'GAP', 'GAP', 'CAR', 'GAP', 'GAP', 'GAP', 'CAR', 'GAP', 'GAP', 'GAP', 'GAP'], baseSpeed: 2.2 },
-        { slots: ['CAR', 'CAR', 'GAP', 'GAP', 'CAR', 'GAP', 'GAP', 'GAP', 'GAP', 'GAP', 'CAR', 'GAP'], baseSpeed: 2.4 }
-      ],
-      medium: [
-        { slots: ['CAR', 'GAP', 'TRUCK', 'GAP', 'CAR', 'GAP', 'CAR', 'GAP', 'GAP', 'CAR', 'GAP', 'GAP'], baseSpeed: 2.8 },
-        { slots: ['CAR', 'GAP', 'CAR', 'GAP', 'TRUCK', 'GAP', 'CAR', 'GAP', 'CAR', 'GAP', 'GAP', 'GAP'], baseSpeed: 3 },
-        { slots: ['TRUCK', 'GAP', 'CAR', 'GAP', 'CAR', 'GAP', 'TRUCK', 'GAP', 'CAR', 'GAP', 'GAP', 'CAR'], baseSpeed: 3.2 }
-      ],
-      hard: [
-        { slots: ['CAR', 'TRUCK', 'GAP', 'CAR', 'CAR', 'GAP', 'BUS', 'GAP', 'CAR', 'GAP', 'CAR', 'GAP'], baseSpeed: 3.6 },
-        { slots: ['CAR', 'CAR', 'GAP', 'CAR', 'TRUCK', 'GAP', 'CAR', 'GAP', 'CAR', 'GAP', 'TRUCK', 'GAP'], baseSpeed: 3.8 },
-        { slots: ['CAR', 'TRUCK', 'CAR', 'GAP', 'CAR', 'GAP', 'CAR', 'GAP', 'BUS', 'GAP', 'CAR', 'GAP'], baseSpeed: 4 }
-      ]
-    },
-    riverPatterns: {
-      easy: [
-        { slots: ['LOG_LONG', 'GAP', 'LOG_MED', 'GAP', 'LOG_LONG', 'GAP', 'GAP', 'LOG_LONG'], baseSpeed: 1.2 },
-        { slots: ['LOG_MED', 'GAP', 'LOG_SHORT', 'GAP', 'LOG_MED', 'GAP', 'LOG_LONG', 'GAP'], baseSpeed: 1.3 }
-      ],
-      medium: [
-        { slots: ['LOG_LONG', 'GAP', 'LOG_MED', 'GAP', 'LOG_SHORT', 'GAP', 'LOG_MED', 'GAP', 'LOG_LONG'], baseSpeed: 1.6 },
-        { slots: ['LOG_MED', 'GAP', 'LOG_MED', 'GAP', 'LOG_SHORT', 'GAP', 'LOG_SHORT', 'GAP', 'LOG_LONG'], baseSpeed: 1.7 }
-      ],
-      hard: [
-        { slots: ['LOG_MED', 'GAP', 'LOG_SHORT', 'GAP', 'LOG_MED', 'GAP', 'LOG_MED', 'GAP', 'LOG_SHORT'], baseSpeed: 2 },
-        { slots: ['LOG_SHORT', 'GAP', 'LOG_MED', 'GAP', 'LOG_SHORT', 'GAP', 'LOG_MED', 'GAP', 'LOG_SHORT'], baseSpeed: 2.2 }
-      ]
     }
   };
 

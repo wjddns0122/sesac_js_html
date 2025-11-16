@@ -25,7 +25,7 @@
     GameState.bus.on('score', updateScore);
     GameState.bus.on('coins', updateCoins);
     GameState.bus.on('gameover', showGameOver);
-    GameState.bus.on('new-best', () => newBestBadge.style.display = 'block');
+    GameState.bus.on('new-best', handleNewBest);
     showScreen('menuScreen');
     refreshMenu();
     setInterval(updateGiftPanel, 60000);
@@ -55,8 +55,10 @@
       switch (action) {
         case 'play':
           hideScreen();
+          isPaused = false;
           GameState.startRun();
           newBestBadge.style.display = 'none';
+          newBestBadge.textContent = 'NEW RECORD!';
           break;
         case 'collection':
           showScreen('collectionScreen');
@@ -79,7 +81,10 @@
           break;
         case 'retry':
           hideScreen();
+          isPaused = false;
           GameState.startRun();
+          newBestBadge.style.display = 'none';
+          newBestBadge.textContent = 'NEW RECORD!';
           break;
         case 'gameover-prize':
           showScreen('prizeScreen');
@@ -118,8 +123,20 @@
   }
 
   function handleCommand(command) {
-    if (command === 'pause') return togglePause(!isPaused);
+    if (command === 'pause') {
+      togglePause(!isPaused);
+      return;
+    }
+    if (isPaused) return;
     GameState.tryMove(command);
+  }
+
+  function handleNewBest(payload) {
+    if (payload && payload.newRecord) {
+      newBestBadge.style.display = 'block';
+      newBestBadge.textContent = 'NEW RECORD!';
+      Renderer.triggerFireworks(GameState.getState());
+    }
   }
 
   function updateScore({ score, highScore }) {
@@ -139,6 +156,7 @@
     document.getElementById('newHighBadge').style.display = payload.newHigh ? 'block' : 'none';
     document.getElementById('gameOverPrizeBtn').disabled = StorageApi.getCoins() < 100;
     showScreen('gameOverScreen');
+    isPaused = false;
     refreshMenu();
   }
 
@@ -158,11 +176,15 @@
 
   function togglePause(force) {
     const desired = typeof force === 'boolean' ? force : !isPaused;
-    isPaused = desired;
-    if (isPaused) {
-      showScreen('pauseScreen');
-    } else if (currentScreen === screens.pauseScreen) {
-      hideScreen();
+    if (desired === isPaused) return;
+    if (desired) {
+      if (GameState.pause()) {
+        isPaused = true;
+        showScreen('pauseScreen');
+      }
+    } else if (GameState.resume()) {
+      isPaused = false;
+      if (currentScreen === screens.pauseScreen) hideScreen();
     }
   }
 

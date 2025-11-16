@@ -24,6 +24,9 @@
     const type = isSafeZone ? 'GRASS' : chooseLaneType(diff, world.laneThemeWeights);
     const laneOptions = buildLaneOptions(type, state, diff);
     const lane = Lanes.createLane(state.nextLaneY, type, laneOptions, world);
+    if (state.highScoreMarkerRow !== null && lane.worldY === state.highScoreMarkerRow) {
+      lane.hasBestMarker = true;
+    }
     state.lanes.push(lane);
     state.laneLookup[state.nextLaneY] = lane;
     state.nextLaneY += 1;
@@ -43,19 +46,15 @@
       };
     }
     if (type === 'ROAD') {
-      const patterns = diff.roadPatterns;
-      const pattern = patterns[Math.floor(Math.random() * patterns.length)];
       return {
-        pattern,
+        pattern: Obstacles.generateRoadPattern(diff.roadSettings),
         direction: Math.random() < 0.5 ? 1 : -1,
         speedMultiplier: diff.carSpeedMultiplier
       };
     }
     if (type === 'RIVER') {
-      const patterns = diff.riverPatterns;
-      const pattern = patterns[Math.floor(Math.random() * patterns.length)];
       return {
-        pattern,
+        pattern: Obstacles.generateRiverPattern(diff.riverSettings),
         direction: Math.random() < 0.5 ? 1 : -1,
         speedMultiplier: diff.logSpeedMultiplier
       };
