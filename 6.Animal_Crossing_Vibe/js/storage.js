@@ -1,27 +1,25 @@
-// js/storage.js
-const STORAGE_KEY_META = 'cr_runner_meta';
+const STORAGE_KEY = 'acv_run_stats';
 
-function loadMeta() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_META);
-    if (!raw) {
-      return {
-        highScore: 0,
-        totalCoins: 0,
-        settings: { sound: true }
-      };
+export function loadStats() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            return { highScore: 0, totalCoins: 0 };
+        }
+        const parsed = JSON.parse(raw);
+        return {
+            highScore: Number(parsed.highScore) || 0,
+            totalCoins: Number(parsed.totalCoins) || 0
+        };
+    } catch (error) {
+        console.warn('Failed to parse save data', error);
+        return { highScore: 0, totalCoins: 0 };
     }
-    return JSON.parse(raw);
-  } catch (e) {
-    console.warn('Failed to parse meta, resetting.', e);
-    return {
-      highScore: 0,
-      totalCoins: 0,
-      settings: { sound: true }
-    };
-  }
 }
 
-function saveMeta(meta) {
-  localStorage.setItem(STORAGE_KEY_META, JSON.stringify(meta));
+export function saveStats(partial) {
+    const current = loadStats();
+    const merged = { ...current, ...partial };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    return merged;
 }

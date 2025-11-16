@@ -1,0 +1,201 @@
+:root {
+    --bg-top: #0b1726;
+    --bg-bottom: #152a38;
+    --hud-bg: rgba(10, 15, 26, 0.7);
+    --accent: #ffed8b;
+    --road: #2b2d42;
+    --grass: #1f8a4c;
+    --river: #1b5d80;
+    --grid-line: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Space Grotesk', 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    color: #f4f4f4;
+    background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stage {
+    width: min(520px, 100%);
+    padding: 1.5rem 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.hud {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    background: var(--hud-bg);
+    backdrop-filter: blur(8px);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: center;
+}
+
+.stat strong {
+    font-size: 0.95rem;
+    color: var(--accent);
+}
+
+#gameCanvas {
+    width: min(432px, 90vw);
+    height: auto;
+    image-rendering: pixelated;
+    border-radius: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    background: #021322;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(12px);
+    background: rgba(3, 5, 10, 0.7);
+    transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay-card {
+    background: rgba(16, 20, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    max-width: 320px;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
+}
+
+.overlay-card h1 {
+    margin: 0.2rem 0 0.6rem;
+    font-size: 1.8rem;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.eyebrow {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+.tagline {
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 1.2rem;
+}
+
+.overlay-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0 0 1.5rem;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.overlay-stats dt {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.overlay-stats dd {
+    margin: 0.2rem 0 0;
+    font-size: 1rem;
+    color: var(--accent);
+}
+
+.primary {
+    appearance: none;
+    border: none;
+    background: var(--accent);
+    color: #0a1020;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.85rem 2.5rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.primary:active {
+    transform: scale(0.97);
+}
+
+.hint {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.result {
+    min-height: 1.6em;
+    color: #ffbebe;
+    font-weight: 600;
+}
+
+#touchPad {
+    width: 100%;
+    max-width: 360px;
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+#touchPad button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    cursor: pointer;
+}
+
+#touchPad button:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.pad-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    #touchPad {
+        display: none;
+    }
+}

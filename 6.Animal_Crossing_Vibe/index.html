@@ -1,25 +1,64 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>Crossy Runner Clone</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Crossing Vibe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="game-container">
-    <canvas id="gameCanvas" width="480" height="640"></canvas>
+    <main class="stage">
+        <header class="hud" aria-live="polite">
+            <div class="stat">
+                <span>Score</span>
+                <strong id="scoreValue">0</strong>
+            </div>
+            <div class="stat">
+                <span>Best</span>
+                <strong id="bestValue">0</strong>
+            </div>
+            <div class="stat">
+                <span>Coins</span>
+                <strong id="coinValue">0</strong>
+            </div>
+        </header>
 
-    <div id="hud">
-      <div>Score: <span id="score-text">0</span></div>
-      <div>Best: <span id="highscore-text">0</span></div>
-      <div>Coins: <span id="coins-text">0</span></div>
-      <button id="restart-btn" style="display:none;">Restart</button>
-    </div>
-  </div>
+        <canvas id="gameCanvas" width="432" height="672" role="img" aria-label="동물 친구들과 함께 하는 탑다운 러너"></canvas>
 
-  <script src="js/storage.js"></script>
-  <script src="js/input.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/main.js"></script>
+        <section id="overlay" class="overlay visible" tabindex="-1">
+            <div class="overlay-card">
+                <p class="eyebrow">Grid Runner</p>
+                <h1>Animal Crossing Vibe</h1>
+                <p class="tagline">한 칸씩 전진하며 차를 피하고 코인을 모아보세요.</p>
+                <dl class="overlay-stats">
+                    <div>
+                        <dt>최고 점수</dt>
+                        <dd id="overlayBest">0</dd>
+                    </div>
+                    <div>
+                        <dt>총 코인</dt>
+                        <dd id="overlayCoins">0</dd>
+                    </div>
+                </dl>
+                <p class="result" id="overlayResult"></p>
+                <button id="startButton" class="primary">탭하여 시작</button>
+                <p class="hint">방향키 또는 터치 패드를 이용해 이동하세요.</p>
+            </div>
+        </section>
+
+        <section id="touchPad" aria-label="터치 이동 패드">
+            <button data-direction="up">▲</button>
+            <div class="pad-row">
+                <button data-direction="left">◀</button>
+                <button data-direction="down">▼</button>
+                <button data-direction="right">▶</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/gridRunner.js" defer></script>
 </body>
 </html>
