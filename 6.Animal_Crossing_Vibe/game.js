@@ -9,6 +9,7 @@
   var canvas = null;
   var ctx = null;
   var player = null;
+  var mapRows = [];
 
   document.addEventListener("DOMContentLoaded", function () {
     canvas = document.getElementById("gameCanvas");
@@ -16,6 +17,7 @@
 
     setupCanvas();
     player = createPlayer();
+    initGame();
     bindInputs();
     window.requestAnimationFrame(gameLoop);
   });
@@ -36,6 +38,7 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    renderRows(ctx);
     renderGrid(ctx);
     renderPlayer(ctx, player);
   }
@@ -46,6 +49,52 @@
       row: GRID_ROWS - 1,
       col: Math.floor(GRID_COLS / 2),
     };
+  }
+
+  function initGame() {
+    mapRows = [];
+    for (var rowIndex = 0; rowIndex < GRID_ROWS; rowIndex += 1) {
+      var type = "grass";
+      var laneConfig = null;
+
+      // Make a small band of middle rows into roads for future vehicle spawning
+      if (rowIndex >= 6 && rowIndex <= 11) {
+        type = "road";
+        laneConfig = {
+          direction: rowIndex % 2 === 0 ? 1 : -1,
+          baseSpeed: 70 + (rowIndex % 3) * 10,
+          spawnIntervalMin: 1.2,
+          spawnIntervalMax: 2.6,
+        };
+      }
+
+      mapRows.push(createRow(rowIndex, type, laneConfig));
+    }
+  }
+
+  function createRow(rowIndex, type, config) {
+    // index: vertical position; rowType: visuals/behavior; cars: vehicles in this lane
+    // laneConfig: preferred direction/speed/spawn rates; spawnTimer: countdown for next car
+    return {
+      index: rowIndex,
+      rowType: type,
+      cars: [],
+      laneConfig: config,
+      spawnTimer: 0,
+    };
+  }
+
+  function renderRows(context) {
+    if (!mapRows.length) {
+      return;
+    }
+
+    mapRows.forEach(function (row) {
+      var color = row.rowType === "road" ? "#6c6f7d" : "#d9f8c4";
+      var y = row.index * TILE_SIZE;
+      context.fillStyle = color;
+      context.fillRect(0, y, canvas.width, TILE_SIZE);
+    });
   }
 
   function renderGrid(context) {
