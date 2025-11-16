@@ -1,5 +1,6 @@
 (function () {
   let canvas;
+  let hudLayer;
   let hudScore;
   let hudCoins;
   let newBestBadge;
@@ -8,6 +9,11 @@
   let currentScreen = null;
   let isPaused = false;
   let loop;
+  let menuCoinsTop;
+  let menuCharacterName;
+  let menuHighScoreLabel;
+  let menuCharacterPreview;
+  let statsList;
 
   function init() {
     cacheDom();
@@ -33,16 +39,23 @@
 
   function cacheDom() {
     canvas = document.getElementById('gameCanvas');
+    hudLayer = document.getElementById('hudLayer');
     hudScore = document.getElementById('scoreValue');
     hudCoins = document.getElementById('coinValue');
     newBestBadge = document.getElementById('newBestBadge');
     pauseBtn = document.getElementById('pauseBtn');
+    menuCoinsTop = document.getElementById('menuCoinsTop');
+    menuCharacterName = document.getElementById('menuCharacterName');
+    menuHighScoreLabel = document.getElementById('menuHighScore');
+    menuCharacterPreview = document.getElementById('menuCharacterPreview');
+    statsList = document.getElementById('statsList');
     screens = {
       menuScreen: document.getElementById('menuScreen'),
       gameOverScreen: document.getElementById('gameOverScreen'),
       prizeScreen: document.getElementById('prizeScreen'),
       collectionScreen: document.getElementById('collectionScreen'),
       settingsScreen: document.getElementById('settingsScreen'),
+      statsScreen: document.getElementById('statsScreen'),
       unlockPopup: document.getElementById('unlockPopup'),
       pauseScreen: document.getElementById('pauseScreen')
     };
@@ -54,11 +67,7 @@
       if (!action) return;
       switch (action) {
         case 'play':
-          hideScreen();
-          isPaused = false;
-          GameState.startRun();
-          newBestBadge.style.display = 'none';
-          newBestBadge.textContent = 'NEW RECORD!';
+          startGameFromMenu();
           break;
         case 'collection':
           showScreen('collectionScreen');
@@ -72,6 +81,14 @@
           showScreen('settingsScreen');
           renderSettings();
           break;
+        case 'stats':
+          showScreen('statsScreen');
+          renderStats();
+          break;
+        case 'stats-back':
+          showScreen('menuScreen');
+          refreshMenu();
+          break;
         case 'menu':
         case 'collection-back':
         case 'prize-back':
@@ -80,11 +97,7 @@
           refreshMenu();
           break;
         case 'retry':
-          hideScreen();
-          isPaused = false;
-          GameState.startRun();
-          newBestBadge.style.display = 'none';
-          newBestBadge.textContent = 'NEW RECORD!';
+          startGameFromMenu();
           break;
         case 'gameover-prize':
           showScreen('prizeScreen');
@@ -120,12 +133,33 @@
       document.getElementById('characterGrid').classList.toggle('hidden', tab !== 'collection');
       document.getElementById('shopGrid').classList.toggle('hidden', tab !== 'shop');
     });
+    if (menuCharacterPreview) {
+      menuCharacterPreview.addEventListener('click', () => {
+        showScreen('collectionScreen');
+        renderCollection();
+      });
+    }
+  }
+
+  function startGameFromMenu() {
+    hideScreen();
+    isPaused = false;
+    GameState.startRun();
+    document.body.classList.remove('menu-open');
+    newBestBadge.style.display = 'none';
+    newBestBadge.textContent = 'NEW RECORD!';
   }
 
   function handleCommand(command) {
     if (command === 'pause') {
       togglePause(!isPaused);
       return;
+    }
+    if (command === 'start') {
+      if (currentScreen === screens.menuScreen || currentScreen === screens.gameOverScreen) {
+        startGameFromMenu();
+        return;
+      }
     }
     if (isPaused) return;
     GameState.tryMove(command);
@@ -141,12 +175,13 @@
 
   function updateScore({ score, highScore }) {
     hudScore.textContent = score;
-    document.getElementById('menuHighScore').textContent = highScore;
+    if (menuHighScoreLabel) menuHighScoreLabel.textContent = highScore;
     document.getElementById('gameOverBest').textContent = highScore;
   }
 
   function updateCoins({ totalCoins }) {
     hudCoins.textContent = totalCoins;
+    if (menuCoinsTop) menuCoinsTop.textContent = totalCoins;
     document.getElementById('menuCoins').textContent = totalCoins;
   }
 
@@ -166,6 +201,12 @@
     if (screen) {
       screen.classList.add('active');
       currentScreen = screen;
+      const isMenu = screen === screens.menuScreen;
+      document.body.classList.toggle('menu-open', isMenu);
+      if (isMenu) {
+        GameState.enterMenu();
+        refreshMenu();
+      }
     }
   }
 
@@ -219,6 +260,7 @@
         card.addEventListener('click', () => {
           StorageApi.setSelectedCharacter(character.id);
           GameState.getState().player && Player.setCharacterColors(GameState.getState().player, character);
+          refreshMenu();
           renderCollection();
         });
       }
@@ -240,6 +282,7 @@
       StorageApi.setCoins(StorageApi.getCoins() - character.unlockCost);
       StorageApi.addOwnedCharacter(character.id);
       Screens.showUnlockPopup(character);
+      refreshMenu();
       renderCollection();
       updateCoins({ totalCoins: StorageApi.getCoins() });
     });
@@ -284,29 +327,41 @@
     document.getElementById('statsPanel').innerHTML = `Games: ${stats.games}<br>Coins Collected: ${stats.coinsCollected}<br>Best Distance: ${stats.bestDistance}<br>Characters: ${stats.unlocked}/${Characters.list.length}`;
   }
 
+  function renderStats() {
+    if (!statsList) return;
+    const stats = StorageApi.getStats();
+    statsList.innerHTML = `
+      <div><strong>Games Played</strong><span>${stats.games}</span></div>
+      <div><strong>Total Coins</strong><span>${stats.coinsCollected}</span></div>
+      <div><strong>Best Distance</strong><span>${stats.bestDistance}</span></div>
+      <div><strong>Characters</strong><span>${stats.unlocked}/${Characters.list.length}</span></div>
+    `;
+  }
+
   function refreshMenu() {
     const selected = Characters.getCharacterById(StorageApi.getSelectedCharacter());
-    const preview = document.getElementById('menuCharacterPreview');
-    preview.style.width = '80px';
-    preview.style.height = '80px';
-    preview.style.margin = '0 auto 12px';
-    preview.style.background = selected.colors.body;
-    document.getElementById('menuHighScore').textContent = StorageApi.getHighScore();
+    if (menuCharacterName) menuCharacterName.textContent = selected.displayName;
+    if (menuCharacterPreview) {
+      menuCharacterPreview.style.setProperty('--body', selected.colors.body);
+      menuCharacterPreview.style.setProperty('--accent', selected.colors.accent);
+    }
+    if (menuHighScoreLabel) menuHighScoreLabel.textContent = StorageApi.getHighScore();
+    if (menuCoinsTop) menuCoinsTop.textContent = StorageApi.getCoins();
     document.getElementById('menuCoins').textContent = StorageApi.getCoins();
     updateGiftPanel();
   }
 
   function updateGiftPanel() {
-    const countdown = document.getElementById('giftCountdown');
     const button = document.getElementById('giftButton');
+    if (!button) return;
     const remain = DailyRewards.getRemaining();
     if (remain === 0) {
       button.classList.add('available');
-      countdown.textContent = 'Ready!';
+      button.querySelector('span').textContent = 'Ready!';
     } else {
       button.classList.remove('available');
       const minutes = Math.ceil(remain / 60000);
-      countdown.textContent = `${minutes} min`;
+      button.querySelector('span').textContent = `${minutes}m`;
     }
   }
 

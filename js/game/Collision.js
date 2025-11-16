@@ -7,12 +7,14 @@
     const player = state.player;
     const lane = getLane(state, player.targetY);
     if (!lane) return null;
-    if (player.targetX < -0.4 || player.targetX > Config.virtualWidth - 0.6) return { type: 'OUT' };
+    const tileX = Math.round(player.targetX);
+    if (tileX < 0 || tileX > Config.virtualWidth - 1) return { type: 'OUT' };
+    if (lane.solidTiles && lane.solidTiles[tileX]) return null;
     if (lane.type === 'ROAD') {
       if (lane.vehicles.some((car) => player.targetX >= car.x - 0.3 && player.targetX <= car.x + car.length - 0.3)) return { type: 'VEHICLE' };
     }
     if (lane.type === 'RIVER') {
-      const log = lane.logs.find((log) => player.targetX >= log.x - 0.3 && player.targetX <= log.x + log.length - 0.7);
+      const log = lane.logs.find((log) => player.targetX >= log.x - 0.25 && player.targetX <= log.x + log.length - 0.75);
       if (!log) return { type: 'DROWN' };
       return { type: 'LOG', payload: log };
     }

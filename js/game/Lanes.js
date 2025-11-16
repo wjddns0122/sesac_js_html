@@ -8,7 +8,7 @@
   }
 
   function createGrassLane(worldY, options, theme) {
-    const blocks = Obstacles.createGrassBlocks({
+    const grass = Obstacles.createGrassTiles({
       density: options?.density ?? Config.NORMAL_GRASS_OBSTACLE_DENSITY,
       corridorX: options?.corridorX ?? Math.floor(Config.virtualWidth / 2),
       minEmpty: options?.minEmpty ?? Config.MIN_EMPTY_TILES_PER_GRASS_ROW
@@ -16,37 +16,44 @@
     return {
       worldY,
       type: 'GRASS',
-      blocks,
+      blocks: grass.indexes,
+      solidTiles: grass.solid,
       coins: Math.random() < 0.2 ? Obstacles.createCoins('line') : Obstacles.createCoins(),
       props: pickProps(theme?.props?.grass || [])
     };
   }
 
   function createRoadLane(worldY, options) {
-    const data = Obstacles.createRoadPattern(options.pattern, options.direction, options.speedMultiplier);
+    const pattern = options.pattern;
+    const data = Obstacles.createRoadPattern(pattern, options.direction);
     return {
       worldY,
       type: 'ROAD',
-      speed: data.speed,
+      direction: options.direction,
+      baseSpeed: pattern.baseSpeed,
       vehicles: data.vehicles,
       wrapStart: data.wrapStart,
       wrapEnd: data.wrapEnd,
       wrapSpan: data.wrapSpan,
+      solidTiles: new Array(Config.virtualWidth).fill(false),
       coins: Math.random() < 0.15 ? Obstacles.createCoins() : [],
       props: pickProps(['sign', 'cone', 'streetlight'])
     };
   }
 
   function createRiverLane(worldY, options) {
-    const data = Obstacles.createRiverPattern(options.pattern, options.direction, options.speedMultiplier);
+    const pattern = options.pattern;
+    const data = Obstacles.createRiverPattern(pattern, options.direction);
     return {
       worldY,
       type: 'RIVER',
-      speed: data.speed,
+      direction: options.direction,
+      baseSpeed: pattern.baseSpeed,
       logs: data.logs,
       wrapStart: data.wrapStart,
       wrapEnd: data.wrapEnd,
       wrapSpan: data.wrapSpan,
+      solidTiles: new Array(Config.virtualWidth).fill(false),
       coins: Math.random() < 0.12 ? Obstacles.createCoins() : [],
       props: pickProps(['lily', 'stone'])
     };
@@ -57,6 +64,7 @@
       worldY,
       type: 'RAIL',
       data: Obstacles.initRailData(),
+      solidTiles: new Array(Config.virtualWidth).fill(false),
       coins: Math.random() < 0.08 ? Obstacles.createCoins() : [],
       props: pickProps(['gate', 'signal'])
     };
@@ -67,11 +75,15 @@
     return list.filter(() => Math.random() < 0.3);
   }
 
-  function updateLane(lane, dt) {
+  function updateLane(lane, dt, speedMultiplier) {
     if (lane.type === 'ROAD') {
-      Obstacles.updateRoadLane(lane, dt);
+      const speed = lane.direction * lane.baseSpeed * speedMultiplier;
+      lane.currentSpeed = speed;
+      Obstacles.updateRoadLane(lane, dt, speed);
     } else if (lane.type === 'RIVER') {
-      Obstacles.updateRiverLane(lane, dt);
+      const speed = lane.direction * lane.baseSpeed * speedMultiplier;
+      lane.currentSpeed = speed;
+      Obstacles.updateRiverLane(lane, dt, speed);
     } else if (lane.type === 'RAIL') {
       Obstacles.updateRail(lane.data, dt);
     }

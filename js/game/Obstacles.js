@@ -19,15 +19,8 @@
     return Math.floor(random(min, max + 1));
   }
 
-  function pickWeighted(specs) {
-    const entries = Object.values(specs);
-    const total = entries.reduce((sum, spec) => sum + (spec.weight || 1), 0);
-    let roll = Math.random() * total;
-    for (const spec of entries) {
-      roll -= spec.weight || 1;
-      if (roll <= 0) return spec;
-    }
-    return entries[0];
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
   }
 
   function createCoins(pattern) {
@@ -43,45 +36,42 @@
     return coins;
   }
 
-  function createGrassBlocks({ density, corridorX, minEmpty }) {
-    const blocked = new Array(Config.virtualWidth).fill(false);
+  function createGrassTiles({ density, corridorX, minEmpty }) {
+    const solid = new Array(Config.virtualWidth).fill(false);
     for (let x = 0; x < Config.virtualWidth; x += 1) {
       if (Math.abs(x - corridorX) <= 1) continue;
-      if (Math.random() < density) blocked[x] = true;
+      if (Math.random() < density) solid[x] = true;
     }
-    let emptyCount = blocked.reduce((count, isBlocked) => count + (isBlocked ? 0 : 1), 0);
-    if (emptyCount < minEmpty) {
-      for (let x = 0; x < blocked.length && emptyCount < minEmpty; x += 1) {
-        if (blocked[x]) {
-          blocked[x] = false;
-          emptyCount += 1;
-        }
+    let emptyTiles = solid.reduce((count, isBlocked) => count + (isBlocked ? 0 : 1), 0);
+    if (emptyTiles < minEmpty) {
+      for (let x = 0; x < solid.length && emptyTiles < minEmpty; x += 1) {
+        if (!solid[x]) continue;
+        solid[x] = false;
+        emptyTiles += 1;
       }
     }
-    return blocked.reduce((arr, isBlocked, index) => {
-      if (isBlocked) arr.push(index);
-      return arr;
+    const indexes = solid.reduce((list, isBlocked, idx) => {
+      if (isBlocked) list.push(idx);
+      return list;
     }, []);
+    return { solid, indexes };
   }
 
   function generateRoadPattern(settings) {
-    const slotsNeeded = settings.patternLength + settings.gapVariance;
-    const raw = [];
-    const minGapSlots = Math.max(2, Math.ceil(settings.minGapVehicleLengths * 3));
-    const maxGapSlots = Math.max(minGapSlots, minGapSlots + settings.gapVariance);
-    const targetVehicles = Math.max(1, Math.floor(settings.patternLength * settings.targetDensity));
-    let vehiclesPlaced = 0;
-    while (raw.length < slotsNeeded && vehiclesPlaced < targetVehicles) {
-      raw.push(randomVehicleToken());
-      vehiclesPlaced += 1;
-      const gap = randomInt(minGapSlots, maxGapSlots);
-      for (let i = 0; i < gap; i += 1) raw.push('GAP');
-    }
-    while (raw.length < slotsNeeded) raw.push('GAP');
-    const slots = [];
-    const offset = randomInt(0, Math.max(0, raw.length - settings.patternLength));
-    for (let i = 0; i < settings.patternLength; i += 1) {
-      slots.push(raw[(offset + i) % raw.length]);
+    const slots = new Array(settings.patternLength).fill('GAP');
+    const maxCars = Math.max(1, Math.floor(settings.patternLength / (settings.minGapVehicleLengths + 1)));
+    const carCount = clamp(Math.round(settings.patternLength * settings.targetDensity), 1, maxCars);
+    const spacing = Math.max(1, Math.floor(settings.patternLength / carCount));
+    const jitter = 1;
+    for (let i = 0; i < carCount; i += 1) {
+      let position = Math.floor(i * spacing + randomInt(-jitter, jitter));
+      position = (position + settings.patternLength) % settings.patternLength;
+      let safety = 0;
+      while (slots[position] !== 'GAP' && safety < settings.patternLength) {
+        position = (position + 1) % settings.patternLength;
+        safety += 1;
+      }
+      slots[position] = pickVehicleToken();
     }
     ensureGapRun(slots, 3);
     return {
@@ -90,44 +80,40 @@
     };
   }
 
-  function randomVehicleToken() {
+  function pickVehicleToken() {
     const roll = Math.random();
     if (roll < 0.5) return 'CAR';
-    if (roll < 0.8) return 'TRUCK';
+    if (roll < 0.85) return 'TRUCK';
     return 'BUS';
   }
 
   function generateRiverPattern(settings) {
-    const slotsNeeded = settings.patternLength + settings.maxGapTiles;
-    const raw = [];
-    const targetLogs = Math.max(1, Math.floor(settings.patternLength * settings.targetDensity));
-    let logsPlaced = 0;
-    while (raw.length < slotsNeeded && logsPlaced < targetLogs) {
-      raw.push(randomLogToken());
-      logsPlaced += 1;
-      const gap = randomInt(settings.minGapTiles, settings.maxGapTiles);
-      for (let i = 0; i < gap; i += 1) raw.push('GAP');
+    const slots = new Array(settings.patternLength).fill('GAP');
+    const maxLogs = Math.max(2, Math.floor(settings.patternLength / (settings.minGapTiles + 1)));
+    const logCount = clamp(Math.round(settings.patternLength * settings.targetDensity), 2, maxLogs);
+    let cursor = randomInt(0, settings.maxGapTiles);
+    for (let i = 0; i < logCount; i += 1) {
+      const index = Math.floor(cursor) % settings.patternLength;
+      if (slots[index] === 'GAP') {
+        slots[index] = pickLogToken();
+      }
+      cursor += settings.minGapTiles + 1 + randomInt(0, Math.max(0, settings.maxGapTiles - settings.minGapTiles));
     }
-    while (raw.length < slotsNeeded) raw.push('GAP');
-    const slots = [];
-    const offset = randomInt(0, Math.max(0, raw.length - settings.patternLength));
-    for (let i = 0; i < settings.patternLength; i += 1) {
-      slots.push(raw[(offset + i) % raw.length]);
-    }
+    ensureGapRun(slots, settings.minGapTiles + 1);
     return {
       slots,
       baseSpeed: settings.baseSpeed
     };
   }
 
-  function randomLogToken() {
+  function pickLogToken() {
     const roll = Math.random();
     if (roll < 0.4) return 'LOG_LONG';
     if (roll < 0.75) return 'LOG_MED';
     return 'LOG_SHORT';
   }
 
-  function createRoadPattern(pattern, direction, speedMultiplier) {
+  function createRoadPattern(pattern, direction) {
     const slotSpacing = Config.ROAD_SLOT_SPACING;
     const wrapLength = pattern.slots.length * slotSpacing + Config.virtualWidth + 6;
     const startX = direction > 0 ? -wrapLength / 2 : Config.virtualWidth + wrapLength / 2;
@@ -137,36 +123,28 @@
       const spec = VEHICLE_SPECS[slot] || VEHICLE_SPECS.CAR;
       const offset = index * slotSpacing;
       const x = direction > 0 ? startX + offset : startX - offset;
-      vehicles.push({
-        x,
-        length: spec.length,
-        color: spec.color
-      });
+      vehicles.push({ x, length: spec.length, color: spec.color });
     });
-    const baseSpeed = pattern.baseSpeed * speedMultiplier;
-    const wrapStart = -wrapLength;
-    const wrapEnd = Config.virtualWidth + wrapLength;
     return {
       vehicles,
-      speed: baseSpeed * direction,
-      wrapStart,
-      wrapEnd,
-      wrapSpan: wrapEnd - wrapStart
+      wrapStart: -wrapLength,
+      wrapEnd: Config.virtualWidth + wrapLength,
+      wrapSpan: wrapLength
     };
   }
 
-  function updateRoadLane(lane, dt) {
+  function updateRoadLane(lane, dt, speed) {
     lane.vehicles.forEach((vehicle) => {
-      vehicle.x += lane.speed * dt;
-      if (lane.speed > 0 && vehicle.x > lane.wrapEnd) {
+      vehicle.x += speed * dt;
+      if (speed > 0 && vehicle.x > lane.wrapEnd) {
         vehicle.x -= lane.wrapSpan;
-      } else if (lane.speed < 0 && vehicle.x < lane.wrapStart - vehicle.length) {
+      } else if (speed < 0 && vehicle.x < lane.wrapStart - vehicle.length) {
         vehicle.x += lane.wrapSpan;
       }
     });
   }
 
-  function createRiverPattern(pattern, direction, speedMultiplier) {
+  function createRiverPattern(pattern, direction) {
     const slotSpacing = Config.RIVER_SLOT_SPACING;
     const wrapLength = pattern.slots.length * slotSpacing + Config.virtualWidth + 6;
     const startX = direction > 0 ? -wrapLength / 2 : Config.virtualWidth + wrapLength / 2;
@@ -176,30 +154,22 @@
       const spec = LOG_SPECS[slot] || LOG_SPECS.LOG_MED;
       const offset = index * slotSpacing;
       const x = direction > 0 ? startX + offset : startX - offset;
-      logs.push({
-        x,
-        length: spec.length,
-        color: Config.palette.logBody
-      });
+      logs.push({ x, length: spec.length, color: Config.palette.logBody });
     });
-    const baseSpeed = pattern.baseSpeed * speedMultiplier;
-    const wrapStart = -wrapLength;
-    const wrapEnd = Config.virtualWidth + wrapLength;
     return {
       logs,
-      speed: baseSpeed * direction,
-      wrapStart,
-      wrapEnd,
-      wrapSpan: wrapEnd - wrapStart
+      wrapStart: -wrapLength,
+      wrapEnd: Config.virtualWidth + wrapLength,
+      wrapSpan: wrapLength
     };
   }
 
-  function updateRiverLane(lane, dt) {
+  function updateRiverLane(lane, dt, speed) {
     lane.logs.forEach((log) => {
-      log.x += lane.speed * dt;
-      if (lane.speed > 0 && log.x > lane.wrapEnd) {
+      log.x += speed * dt;
+      if (speed > 0 && log.x > lane.wrapEnd) {
         log.x -= lane.wrapSpan;
-      } else if (lane.speed < 0 && log.x < lane.wrapStart - log.length) {
+      } else if (speed < 0 && log.x < lane.wrapStart - log.length) {
         log.x += lane.wrapSpan;
       }
     });
@@ -267,7 +237,7 @@
 
   window.Obstacles = {
     createCoins,
-    createGrassBlocks,
+    createGrassTiles,
     generateRoadPattern,
     createRoadPattern,
     updateRoadLane,

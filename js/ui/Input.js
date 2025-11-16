@@ -28,6 +28,9 @@
         return 'right';
       case 'Escape':
         return 'pause';
+      case 'Space':
+      case 'Enter':
+        return 'start';
       default:
         return null;
     }

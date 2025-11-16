@@ -3,6 +3,8 @@
   let ctx;
   let scale = 1;
   let lastTimestamp = 0;
+  let menuScroll = 0;
+  let menuCarPhase = 0;
   const fireworks = [];
 
   function init(canvasEl) {
@@ -20,7 +22,7 @@
   }
 
   function render(state) {
-    if (!ctx || !state.player) return;
+    if (!ctx) return;
     const now = performance.now();
     const dt = lastTimestamp ? (now - lastTimestamp) / 1000 : 0;
     lastTimestamp = now;
@@ -28,12 +30,51 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.scale(scale, scale);
     ctx.translate((canvas.width / scale - Config.virtualWidth * Config.tileSize) / 2, (canvas.height / scale - Config.virtualRows * Config.tileSize) / 2);
+
+    if (!state || state.phase === 'MENU') {
+      drawMenuScene(dt);
+    } else {
+      drawGameplayScene(state, dt);
+    }
+
+    ctx.restore();
+  }
+
+  function drawMenuScene(dt) {
+    const tile = Config.tileSize;
+    const width = Config.virtualWidth * tile;
+    const height = Config.virtualRows * tile;
+    const sky = ctx.createLinearGradient(0, 0, 0, height);
+    sky.addColorStop(0, '#8ce6ff');
+    sky.addColorStop(1, '#3a56a3');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, width, height);
+
+    menuScroll = (menuScroll + dt * 0.7) % 1;
+    for (let i = -1; i < Config.virtualRows + 2; i += 1) {
+      const y = (i + menuScroll) * tile - tile;
+      const laneType = i % 3;
+      let color = Config.palette.grassBase;
+      if (laneType === 1) color = Config.palette.roadBase;
+      if (laneType === 2) color = Config.palette.riverWater;
+      ctx.fillStyle = color;
+      ctx.fillRect(0, y, width, tile * 0.9);
+    }
+
+    menuCarPhase = (menuCarPhase + dt * 1.2) % (Config.virtualWidth + 4);
+    for (let i = 0; i < 4; i += 1) {
+      const offset = (menuCarPhase + i * 2) % (Config.virtualWidth + 4) - 2;
+      ctx.fillStyle = i % 2 === 0 ? '#ff8a80' : '#ffd54f';
+      ctx.fillRect(offset * tile, height * 0.25 + i * tile * 0.6, tile * 1.4, tile * 0.35);
+    }
+  }
+
+  function drawGameplayScene(state, dt) {
     drawBackground();
     drawLanes(state);
     drawPlayer(state);
     updateFireworks(dt);
     drawFireworks(state);
-    ctx.restore();
   }
 
   function drawBackground() {
@@ -56,7 +97,7 @@
       drawProps(lane, y);
       drawCoins(lane, y);
       if (lane.type === 'ROAD') drawVehicles(lane, y);
-      if (lane.type === 'RIVER') drawLogs(lane, y, state);
+      if (lane.type === 'RIVER') drawLogs(lane, y);
       if (lane.type === 'RAIL') drawRail(lane, y);
     });
   }
@@ -168,10 +209,8 @@
     const tile = Config.tileSize;
     fireworks.forEach((burst) => {
       burst.particles.forEach((particle) => {
-        const worldX = burst.x + particle.x;
-        const worldY = burst.y + particle.y;
-        const px = worldX * tile + tile * 0.5;
-        const py = rowToPixel(worldY, state.cameraY) + tile * 0.5;
+        const px = (burst.x + particle.x) * tile + tile * 0.5;
+        const py = rowToPixel(burst.y + particle.y, state.cameraY) + tile * 0.5;
         ctx.fillStyle = particle.color;
         ctx.globalAlpha = 1 - particle.age / particle.life;
         ctx.beginPath();

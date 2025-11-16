@@ -74,14 +74,17 @@
 
   function update(dt) {
     if (state.phase !== 'PLAYING') return;
+    const speedMultiplier = getObstacleSpeedMultiplier();
     worldEnsure();
-    state.lanes.forEach((lane) => Lanes.updateLane(lane, dt));
+    state.lanes.forEach((lane) => Lanes.updateLane(lane, dt, speedMultiplier));
     Player.applyPlatformMotion(state.player, dt);
     Player.update(state.player, dt);
     const hazard = Collision.check(state);
     if (hazard) {
       if (hazard.type === 'LOG') {
-        Player.attachToPlatform(state.player, state.laneLookup[Math.round(state.player.targetY)].speed);
+        const laneRef = state.laneLookup[Math.round(state.player.targetY)];
+        const attachedSpeed = laneRef ? laneRef.currentSpeed || laneRef.direction * laneRef.baseSpeed * speedMultiplier : 0;
+        Player.attachToPlatform(state.player, attachedSpeed);
         state.currentRiverChain += 1;
         state.longestRiverChain = Math.max(state.longestRiverChain, state.currentRiverChain);
       } else if (hazard.type === 'DROWN') {
@@ -138,7 +141,7 @@
     if (nextX < 0 || nextX > Config.virtualWidth - 1) return;
     const lane = state.laneLookup[Math.round(nextY)];
     if (!lane) return;
-    if (lane.type === 'GRASS' && lane.blocks && lane.blocks.includes(Math.round(nextX))) return;
+    if (lane.solidTiles && lane.solidTiles[Math.round(nextX)]) return;
     Player.commandMove(state.player, delta.dx, delta.dy);
     postMove(delta);
   }
@@ -197,6 +200,10 @@
     return true;
   }
 
+  function enterMenu() {
+    state.phase = 'MENU';
+  }
+
   function updateCamera() {
     const desired = state.player.targetY - Config.cameraRowsFromBottom;
     if (desired > state.cameraY) state.cameraY = desired;
@@ -205,6 +212,11 @@
   function emitMeta() {
     bus.emit('score', { score: state.score, highScore: state.highScore });
     bus.emit('coins', { totalCoins: state.totalCoins, runCoins: state.runCoins });
+  }
+
+  function getObstacleSpeedMultiplier() {
+    const tier = Math.floor(Math.max(0, state.score) / 100);
+    return Config.OBSTACLE_BASE_SPEED_MULTIPLIER + tier * Config.OBSTACLE_SPEED_STEP_PER_100;
   }
 
   function getState() {
@@ -218,6 +230,7 @@
     tryMove,
     pause,
     resume,
+    enterMenu,
     bus,
     getState
   };

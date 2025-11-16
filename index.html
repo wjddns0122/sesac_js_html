@@ -13,7 +13,7 @@
       <button id="pauseBtn" aria-label="Pause">‖</button>
       <div id="scoreDisplay">
         <div id="scoreValue">0</div>
-        <div id="newBestBadge">NEW BEST!</div>
+        <div id="newBestBadge">NEW RECORD!</div>
       </div>
       <div id="coinDisplay">
         <span class="coin-icon">🪙</span>
@@ -21,22 +21,33 @@
       </div>
     </div>
     <div id="overlayRoot">
-      <section id="menuScreen" class="screen">
-        <div class="panel">
-          <h1>Blocky Hopper</h1>
-          <div id="menuCharacterPreview"></div>
-          <p class="menu-stat">High Score: <span id="menuHighScore">0</span></p>
-          <p class="menu-stat">Coins: <span id="menuCoins">0</span></p>
-          <button data-action="play" class="primary">Play</button>
-          <div class="menu-buttons">
-            <button data-action="collection">Collection</button>
-            <button data-action="prize">Prize Machine</button>
-            <button data-action="settings">Settings</button>
+      <section id="menuScreen" class="screen menu-screen">
+        <div class="menu-overlay">
+          <div class="menu-top">
+            <button data-action="gift" id="giftButton">Free Gift <span>--</span></button>
+            <div class="menu-coins">
+              <span class="coin-icon">🪙</span>
+              <span id="menuCoinsTop">0</span>
+            </div>
           </div>
-          <div id="freeGiftPanel">
-            <button data-action="gift" id="giftButton">Free Gift</button>
-            <small id="giftCountdown"></small>
+          <div class="menu-center">
+            <h1 class="menu-title">Blocky Hopper</h1>
+            <div class="menu-stage">
+              <div class="stage-platform"></div>
+              <div id="menuCharacterPreview"></div>
+            </div>
+            <div class="menu-character-name" id="menuCharacterName">Friend</div>
+            <div class="menu-best">Best <span id="menuHighScore">0</span></div>
+            <button data-action="play" class="play-button">Play</button>
           </div>
+          <div class="menu-actions">
+            <button data-action="prize" class="menu-btn">Prize Machine</button>
+            <button data-action="collection" class="menu-btn">Collection</button>
+            <button data-action="stats" class="menu-btn">Stats</button>
+            <button data-action="settings" class="menu-btn">Settings</button>
+          </div>
+          <div class="menu-footer">v1.1</div>
+          <span id="menuCoins" class="hidden"></span>
         </div>
       </section>
       <section id="gameOverScreen" class="screen">
@@ -85,7 +96,7 @@
             <input type="checkbox" id="soundToggle" />
           </label>
           <label class="toggle">
-            <span>High Graphics</span>
+            <span>Graphics</span>
             <select id="graphicsSelect">
               <option value="high">High</option>
               <option value="low">Low</option>
@@ -93,6 +104,13 @@
           </label>
           <div id="statsPanel"></div>
           <button data-action="settings-back">Back</button>
+        </div>
+      </section>
+      <section id="statsScreen" class="screen">
+        <div class="panel">
+          <h2>Stats</h2>
+          <div id="statsList"></div>
+          <button data-action="stats-back">Back</button>
         </div>
       </section>
       <section id="unlockPopup" class="screen">
