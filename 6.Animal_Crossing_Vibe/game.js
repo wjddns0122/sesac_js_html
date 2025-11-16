@@ -10,15 +10,21 @@
   var BG_COLOR = "#b9fbc0";
 
   // -----------------------------
-  // Lane + car configuration
+  // Lane + entity configuration
   // -----------------------------
   var ROAD_START_ROW = 6;
   var ROAD_END_ROW = 11;
+  var RIVER_START_ROW = 2;
+  var RIVER_END_ROW = 4;
   var CAR_BASE_SPEED = 4; // tiles / second
   var CAR_SPEED_VARIATION = 0.8;
   var CAR_LENGTH_TILES = 1.5;
-  var SPAWN_INTERVAL_MIN = 1.2;
-  var SPAWN_INTERVAL_MAX = 2.6;
+  var CAR_SPAWN_INTERVAL_MIN = 1.2;
+  var CAR_SPAWN_INTERVAL_MAX = 2.6;
+  var LOG_BASE_SPEED = 3.2;
+  var LOG_LENGTH_TILES = 2.5;
+  var LOG_SPAWN_INTERVAL_MIN = 1.5;
+  var LOG_SPAWN_INTERVAL_MAX = 3.2;
 
   // -----------------------------
   // Game state references
@@ -77,7 +83,9 @@
 
   function update(deltaTime) {
     updateCars(deltaTime);
+    updateLogs(deltaTime);
     checkCollision();
+    // checkDrowning(); // placeholder for next milestone
   }
 
   function render() {
@@ -88,6 +96,7 @@
     renderRows();
     renderGrid();
     renderCars();
+    renderLogs();
     renderPlayer();
 
     if (isGameOver) {
@@ -119,19 +128,28 @@
     mapRows = [];
 
     for (var rowIndex = 0; rowIndex < GRID_ROWS; rowIndex += 1) {
-      var isRoad = rowIndex >= ROAD_START_ROW && rowIndex <= ROAD_END_ROW;
+      var type = "grass";
       var laneConfig = null;
 
-      if (isRoad) {
+      if (rowIndex >= ROAD_START_ROW && rowIndex <= ROAD_END_ROW) {
+        type = "road";
         laneConfig = {
           direction: rowIndex % 2 === 0 ? 1 : -1,
           baseSpeed: CAR_BASE_SPEED + (rowIndex % 3) * CAR_SPEED_VARIATION,
-          spawnIntervalMin: SPAWN_INTERVAL_MIN,
-          spawnIntervalMax: SPAWN_INTERVAL_MAX,
+          spawnIntervalMin: CAR_SPAWN_INTERVAL_MIN,
+          spawnIntervalMax: CAR_SPAWN_INTERVAL_MAX,
+        };
+      } else if (rowIndex >= RIVER_START_ROW && rowIndex <= RIVER_END_ROW) {
+        type = "river";
+        laneConfig = {
+          direction: rowIndex % 2 === 0 ? 1 : -1,
+          baseSpeed: LOG_BASE_SPEED,
+          spawnIntervalMin: LOG_SPAWN_INTERVAL_MIN,
+          spawnIntervalMax: LOG_SPAWN_INTERVAL_MAX,
         };
       }
 
-      mapRows.push(createRow(rowIndex, isRoad ? "road" : "grass", laneConfig));
+      mapRows.push(createRow(rowIndex, type, laneConfig));
     }
   }
 
@@ -141,6 +159,7 @@
       index: rowIndex,
       rowType: type,
       cars: [],
+      logs: [],
       laneConfig: config,
       spawnTimer: config ? randomBetween(config.spawnIntervalMin, config.spawnIntervalMax) : 0,
     };
@@ -234,6 +253,10 @@
     });
   }
 
+  function updateLogs(deltaTime) {
+    // placeholder: will manage log spawn and movement similar to cars
+  }
+
   function spawnCar(rowIndex) {
     var row = mapRows[rowIndex];
     if (!row || row.rowType !== "road" || !row.laneConfig) {
@@ -250,6 +273,14 @@
       direction: direction,
       lengthTiles: CAR_LENGTH_TILES,
     });
+  }
+
+  function spawnLog(rowIndex) {
+    // placeholder: next milestone logic similar to spawnCar but for river lanes
+  }
+
+  function checkDrowning() {
+    // placeholder: ensure player stands on a log when on river rows
   }
 
   function checkCollision() {
@@ -301,7 +332,12 @@
   // -----------------------------
   function renderRows() {
     mapRows.forEach(function (row) {
-      var color = row.rowType === "road" ? "#6c6f7d" : "#d9f8c4";
+      var color = "#d9f8c4";
+      if (row.rowType === "road") {
+        color = "#6c6f7d";
+      } else if (row.rowType === "river") {
+        color = "#9ed0f0";
+      }
       var y = row.index * TILE_SIZE;
       ctx.fillStyle = color;
       ctx.fillRect(0, y, canvas.width, TILE_SIZE);
@@ -353,6 +389,25 @@
         ctx.fillStyle = "#ffb347";
         ctx.fillRect(pixelX, pixelY, width, height);
         ctx.strokeStyle = "rgba(0,0,0,0.3)";
+        ctx.strokeRect(pixelX, pixelY, width, height);
+      });
+    });
+  }
+
+  function renderLogs() {
+    mapRows.forEach(function (row) {
+      if (row.rowType !== "river") {
+        return;
+      }
+
+      row.logs.forEach(function (log) {
+        var pixelX = log.x * TILE_SIZE;
+        var pixelY = log.row * TILE_SIZE + 6;
+        var width = log.lengthTiles * TILE_SIZE;
+        var height = TILE_SIZE - 12;
+        ctx.fillStyle = "#b08968";
+        ctx.fillRect(pixelX, pixelY, width, height);
+        ctx.strokeStyle = "rgba(0,0,0,0.2)";
         ctx.strokeRect(pixelX, pixelY, width, height);
       });
     });
