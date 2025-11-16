@@ -4,6 +4,13 @@
   // -----------------------------
   // Grid + Canvas configuration
   // -----------------------------
+  var SAVE_KEY = "crossyClone_saveData";
+  var DEFAULT_SAVE_DATA = {
+    bestScore: 0,
+    totalCoin: 0,
+    unlockedCharacters: ["villager"],
+    currentCharacter: "villager",
+  };
   var TILE_SIZE = 32;
   var GRID_COLS = 15;
   var GRID_ROWS = 20;
@@ -44,12 +51,15 @@
   var coinElement = null;
   var coins = [];
   var collectedCoins = 0;
+  var saveData = null;
 
   // -----------------------------
   // Bootstrapping
   // -----------------------------
   document.addEventListener("DOMContentLoaded", function () {
     cacheDom();
+    saveData = loadGameData();
+    highScore = saveData.bestScore || 0;
     setupCanvas();
     resetGame();
     bindInputs();
@@ -413,8 +423,20 @@
   }
 
   function triggerGameOver() {
+    if (isGameOver) {
+      return;
+    }
     isGameOver = true;
     highScore = Math.max(highScore, score);
+    saveData.bestScore = Math.max(saveData.bestScore || 0, score);
+    saveData.totalCoin = (saveData.totalCoin || 0) + collectedCoins;
+    if (!Array.isArray(saveData.unlockedCharacters) || !saveData.unlockedCharacters.length) {
+      saveData.unlockedCharacters = DEFAULT_SAVE_DATA.unlockedCharacters.slice();
+    }
+    if (!saveData.currentCharacter) {
+      saveData.currentCharacter = DEFAULT_SAVE_DATA.currentCharacter;
+    }
+    saveGameData(saveData);
   }
 
   // -----------------------------
@@ -595,5 +617,47 @@
     }
     var choice = safeRows[Math.floor(Math.random() * safeRows.length)];
     return choice.index;
+  }
+
+  function loadGameData() {
+    var defaults = cloneDefaultSaveData();
+    try {
+      var stored = localStorage.getItem(SAVE_KEY);
+      if (!stored) {
+        return defaults;
+      }
+      var parsed = JSON.parse(stored);
+      return {
+        bestScore: typeof parsed.bestScore === "number" ? parsed.bestScore : defaults.bestScore,
+        totalCoin: typeof parsed.totalCoin === "number" ? parsed.totalCoin : defaults.totalCoin,
+        unlockedCharacters: Array.isArray(parsed.unlockedCharacters) && parsed.unlockedCharacters.length
+          ? parsed.unlockedCharacters
+          : defaults.unlockedCharacters.slice(),
+        currentCharacter: parsed.currentCharacter || (parsed.unlockedCharacters && parsed.unlockedCharacters[0]) || defaults.currentCharacter,
+      };
+    } catch (error) {
+      console.warn("Failed to load save data, using defaults.", error);
+      return defaults;
+    }
+  }
+
+  function saveGameData(data) {
+    if (!data) {
+      return;
+    }
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    } catch (error) {
+      console.warn("Failed to save game data.", error);
+    }
+  }
+
+  function cloneDefaultSaveData() {
+    return {
+      bestScore: DEFAULT_SAVE_DATA.bestScore,
+      totalCoin: DEFAULT_SAVE_DATA.totalCoin,
+      unlockedCharacters: DEFAULT_SAVE_DATA.unlockedCharacters.slice(),
+      currentCharacter: DEFAULT_SAVE_DATA.currentCharacter,
+    };
   }
 })();
