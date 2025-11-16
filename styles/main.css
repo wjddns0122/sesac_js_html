@@ -1,0 +1,155 @@
+:root {
+  --bg:#0b1022;
+  --panel:#1f2648cc;
+  --text:#f4f6ff;
+  --accent:#f8d047;
+  --danger:#ff6363;
+  --coin:#ffd06a;
+}
+*{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#1c2758,#050612);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#appRoot{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+}
+#gameCanvas{
+  width:100%;
+  height:100%;
+  display:block;
+  background:#1b2550;
+}
+#hudLayer{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:12px 20px;
+  pointer-events:none;
+  align-items:center;
+}
+#pauseBtn{
+  pointer-events:auto;
+  border:none;
+  background:rgba(0,0,0,0.4);
+  color:var(--text);
+  width:48px;
+  height:48px;
+  border-radius:24px;
+  font-size:24px;
+  cursor:pointer;
+}
+#scoreDisplay{
+  text-align:center;
+}
+#scoreValue{
+  font-size:40px;
+  font-weight:700;
+}
+#newBestBadge{
+  font-size:14px;
+  color:var(--accent);
+  animation:pulse 1s infinite;
+  display:none;
+}
+#coinDisplay{
+  pointer-events:auto;
+  background:rgba(0,0,0,0.4);
+  padding:8px 14px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.coin-icon{font-size:18px;}
+#overlayRoot{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.screen{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.25s ease;
+}
+.screen.active{
+  opacity:1;
+  pointer-events:auto;
+}
+.panel{
+  background:var(--panel);
+  border-radius:24px;
+  padding:28px;
+  min-width:320px;
+  box-shadow:0 25px 50px rgba(0,0,0,0.5);
+  text-align:center;
+}
+button{
+  border:none;
+  border-radius:16px;
+  padding:12px 24px;
+  background:#2f3770;
+  color:var(--text);
+  font-size:16px;
+  cursor:pointer;
+  margin:6px 0;
+  transition:transform 0.15s ease,background 0.15s;
+}
+button.primary{background:var(--accent);color:#382800;font-weight:700;}
+button:hover{transform:translateY(-2px);}
+.hidden{display:none!important;}
+.menu-buttons{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+#characterGrid,#shopGrid{
+  margin:16px 0;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:12px;
+  max-height:380px;
+  overflow:auto;
+}
+.character-card{
+  background:#2b3364;
+  padding:12px;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+.character-card.locked{opacity:0.4;}
+.character-card.selected{outline:3px solid var(--accent);}
+.character-card .preview{
+  width:48px;
+  height:48px;
+  border-radius:10px;
+}
+#tabs{display:flex;gap:8px;justify-content:center;margin-bottom:12px;}
+#tabs button{flex:1;}
+#tabs button.active{background:var(--accent);color:#2a1c00;}
+.toggle{display:flex;justify-content:space-between;margin:12px 0;align-items:center;}
+#giftButton.available{background:var(--accent);color:#3a2b00;}
+#gameOverScreen #newHighBadge{display:none;color:var(--accent);font-weight:700;margin:8px 0;}
+#unlockPopup{background:rgba(0,0,0,0.6);}
+#unlockPopup .panel{min-width:280px;}
+@keyframes pulse{0%{opacity:0.2;}50%{opacity:1;}100%{opacity:0.2;}}
+@media(max-width:768px){
+  .panel{width:90%;}
+  #hudLayer{flex-direction:column;gap:4px;}
+  #coinDisplay{width:100%;justify-content:center;}
+}

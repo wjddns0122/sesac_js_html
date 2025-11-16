@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blocky Hopper</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <div id="appRoot">
+    <canvas id="gameCanvas"></canvas>
+    <div id="hudLayer">
+      <button id="pauseBtn" aria-label="Pause">‖</button>
+      <div id="scoreDisplay">
+        <div id="scoreValue">0</div>
+        <div id="newBestBadge">NEW BEST!</div>
+      </div>
+      <div id="coinDisplay">
+        <span class="coin-icon">🪙</span>
+        <span id="coinValue">0</span>
+      </div>
+    </div>
+    <div id="overlayRoot">
+      <section id="menuScreen" class="screen">
+        <div class="panel">
+          <h1>Blocky Hopper</h1>
+          <div id="menuCharacterPreview"></div>
+          <p class="menu-stat">High Score: <span id="menuHighScore">0</span></p>
+          <p class="menu-stat">Coins: <span id="menuCoins">0</span></p>
+          <button data-action="play" class="primary">Play</button>
+          <div class="menu-buttons">
+            <button data-action="collection">Collection</button>
+            <button data-action="prize">Prize Machine</button>
+            <button data-action="settings">Settings</button>
+          </div>
+          <div id="freeGiftPanel">
+            <button data-action="gift" id="giftButton">Free Gift</button>
+            <small id="giftCountdown"></small>
+          </div>
+        </div>
+      </section>
+      <section id="gameOverScreen" class="screen">
+        <div class="panel">
+          <h2>Run Over</h2>
+          <div class="stat">Score <span id="gameOverScore">0</span></div>
+          <div class="stat">Best <span id="gameOverBest">0</span></div>
+          <div class="stat">Coins <span id="gameOverCoins">0</span></div>
+          <div id="newHighBadge">NEW HIGH SCORE!</div>
+          <div class="actions">
+            <button data-action="retry" class="primary">Retry</button>
+            <button data-action="menu">Menu</button>
+            <button data-action="gameover-prize" id="gameOverPrizeBtn">Prize Machine</button>
+          </div>
+        </div>
+      </section>
+      <section id="prizeScreen" class="screen">
+        <div class="panel">
+          <h2>Prize Machine</h2>
+          <div id="prizeMachine">
+            <div class="capsule"></div>
+          </div>
+          <p>Cost: 100 <span class="coin-icon">🪙</span></p>
+          <button data-action="roll" id="rollButton" class="primary">Roll</button>
+          <div id="prizeResult"></div>
+          <button data-action="prize-back">Back</button>
+        </div>
+      </section>
+      <section id="collectionScreen" class="screen">
+        <div class="panel">
+          <h2>Collection</h2>
+          <div id="tabs">
+            <button data-tab="collection" class="active">Owned</button>
+            <button data-tab="shop">Shop</button>
+          </div>
+          <div id="characterGrid"></div>
+          <div id="shopGrid" class="hidden"></div>
+          <button data-action="collection-back">Back</button>
+        </div>
+      </section>
+      <section id="settingsScreen" class="screen">
+        <div class="panel">
+          <h2>Settings</h2>
+          <label class="toggle">
+            <span>Sound</span>
+            <input type="checkbox" id="soundToggle" />
+          </label>
+          <label class="toggle">
+            <span>High Graphics</span>
+            <select id="graphicsSelect">
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <div id="statsPanel"></div>
+          <button data-action="settings-back">Back</button>
+        </div>
+      </section>
+      <section id="unlockPopup" class="screen">
+        <div class="panel">
+          <h2>New Character!</h2>
+          <div id="unlockPreview"></div>
+          <div id="unlockName"></div>
+          <button data-action="unlock-close" class="primary">Great!</button>
+        </div>
+      </section>
+      <section id="pauseScreen" class="screen">
+        <div class="panel">
+          <h2>Paused</h2>
+          <button data-action="resume" class="primary">Resume</button>
+          <button data-action="pause-menu">Menu</button>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script src="js/data/Config.js"></script>
+  <script src="js/data/Characters.js"></script>
+  <script src="js/data/Worlds.js"></script>
+  <script src="js/data/Storage.js"></script>
+  <script src="js/core/EventBus.js"></script>
+  <script src="js/core/GameLoop.js"></script>
+  <script src="js/ui/Animation.js"></script>
+  <script src="js/game/Player.js"></script>
+  <script src="js/game/Difficulty.js"></script>
+  <script src="js/game/Obstacles.js"></script>
+  <script src="js/game/Lanes.js"></script>
+  <script src="js/game/WorldGenerator.js"></script>
+  <script src="js/game/Collision.js"></script>
+  <script src="js/game/Unlocks.js"></script>
+  <script src="js/game/PrizeMachine.js"></script>
+  <script src="js/game/DailyRewards.js"></script>
+  <script src="js/game/GameState.js"></script>
+  <script src="js/ui/Renderer.js"></script>
+  <script src="js/ui/Input.js"></script>
+  <script src="js/ui/Sound.js"></script>
+  <script src="js/ui/Screens.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.Screens && window.Screens.init) {
+        window.Screens.init();
+      }
+    });
+  </script>
+</body>
+</html>
