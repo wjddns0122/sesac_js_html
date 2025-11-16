@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Crossy Runner Clone</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+    <div id="hud">
+      <div>Score: <span id="score-text">0</span></div>
+      <div>Best: <span id="highscore-text">0</span></div>
+      <div>Coins: <span id="coins-text">0</span></div>
+      <button id="restart-btn" style="display:none;">Restart</button>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
