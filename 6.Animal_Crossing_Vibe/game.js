@@ -15,15 +15,21 @@
   var player = null;
   var mapRows = [];
   var lastTimestamp = 0;
+  var score = 0;
+  var highScore = 0;
+  var furthestRow = GRID_ROWS - 1;
+  var isGameOver = false;
+  var scoreElement = null;
 
   document.addEventListener("DOMContentLoaded", function () {
     canvas = document.getElementById("gameCanvas");
     ctx = canvas.getContext("2d");
+    scoreElement = document.getElementById("scoreValue");
 
     setupCanvas();
-    player = createPlayer();
-    initGame();
+    resetGame();
     bindInputs();
+    bindRetryButton();
     window.requestAnimationFrame(gameLoop);
   });
 
@@ -41,7 +47,10 @@
     var deltaTime = (timestamp - lastTimestamp) / 1000;
     lastTimestamp = timestamp;
 
-    updateCars(deltaTime);
+    if (!isGameOver) {
+      updateCars(deltaTime);
+      checkCollision();
+    }
     render();
     window.requestAnimationFrame(gameLoop);
   }
@@ -55,6 +64,9 @@
     renderGrid(ctx);
     renderCars(ctx);
     renderPlayer(ctx, player);
+    if (isGameOver) {
+      renderGameOverOverlay(ctx);
+    }
   }
 
   function createPlayer() {
@@ -172,8 +184,27 @@
     });
   }
 
+  function bindRetryButton() {
+    var retryButton = document.querySelector(".button-bar button");
+    if (!retryButton) {
+      return;
+    }
+    retryButton.addEventListener("click", function () {
+      resetGame();
+    });
+  }
+
   function handleMovementInput(key) {
     if (!player) {
+      return false;
+    }
+
+    if (isGameOver && (key === "r" || key === "R")) {
+      resetGame();
+      return true;
+    }
+
+    if (isGameOver) {
       return false;
     }
 
@@ -199,6 +230,7 @@
     // Clamp values so the player cannot leave the grid
     player.row = Math.max(0, Math.min(GRID_ROWS - 1, nextRow));
     player.col = Math.max(0, Math.min(GRID_COLS - 1, nextCol));
+    trackProgress();
     return true;
   }
 
@@ -252,6 +284,72 @@
       direction: direction,
       lengthTiles: CAR_LENGTH_TILES,
     });
+  }
+
+  function checkCollision() {
+    var row = mapRows[player.row];
+    if (!row || row.rowType !== "road") {
+      return;
+    }
+
+    var playerLeft = player.col;
+    var playerRight = player.col + 1;
+
+    var hit = row.cars.some(function (car) {
+      var carLeft = car.x;
+      var carRight = car.x + car.lengthTiles;
+      // Tile ranges overlap if right edge passes left edge and vice versa
+      return carRight > playerLeft && carLeft < playerRight;
+    });
+
+    if (hit) {
+      triggerGameOver();
+    }
+  }
+
+  function triggerGameOver() {
+    isGameOver = true;
+    highScore = Math.max(highScore, score);
+  }
+
+  function resetGame() {
+    player = createPlayer();
+    initGame();
+    furthestRow = player.row;
+    score = 0;
+    isGameOver = false;
+    lastTimestamp = 0;
+    updateScoreDisplay();
+  }
+
+  function trackProgress() {
+    if (player.row < furthestRow) {
+      furthestRow = player.row;
+      score = (GRID_ROWS - 1) - furthestRow;
+      if (score > highScore) {
+        highScore = score;
+      }
+      updateScoreDisplay();
+    }
+  }
+
+  function updateScoreDisplay() {
+    if (!scoreElement) {
+      return;
+    }
+    var padded = score.toString().padStart(4, "0");
+    scoreElement.textContent = padded;
+  }
+
+  function renderGameOverOverlay(context) {
+    context.fillStyle = "rgba(0, 0, 0, 0.45)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "#fff";
+    context.font = "600 20px 'Segoe UI', sans-serif";
+    context.textAlign = "center";
+    context.fillText("Game Over", canvas.width / 2, canvas.height / 2 - 10);
+    context.font = "16px 'Segoe UI', sans-serif";
+    context.fillText("Press R or Retry to restart", canvas.width / 2, canvas.height / 2 + 16);
   }
 
   function randomBetween(min, max) {
