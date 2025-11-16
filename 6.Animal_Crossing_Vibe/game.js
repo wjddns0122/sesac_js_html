@@ -25,6 +25,8 @@
   var LOG_LENGTH_TILES = 2.5;
   var LOG_SPAWN_INTERVAL_MIN = 1.5;
   var LOG_SPAWN_INTERVAL_MAX = 3.2;
+  var COIN_SPAWN_CHANCE = 0.25;
+  var COIN_VALUE = 1;
 
   // -----------------------------
   // Game state references
@@ -39,6 +41,9 @@
   var furthestRow = GRID_ROWS - 1;
   var isGameOver = false;
   var scoreElement = null;
+  var coinElement = null;
+  var coins = [];
+  var collectedCoins = 0;
 
   // -----------------------------
   // Bootstrapping
@@ -56,6 +61,7 @@
     canvas = document.getElementById("gameCanvas");
     ctx = canvas.getContext("2d");
     scoreElement = document.getElementById("scoreValue");
+    coinElement = document.getElementById("coinValue");
   }
 
   function setupCanvas() {
@@ -86,6 +92,7 @@
     var playerOnLog = updateLogs(deltaTime);
     checkCollision();
     checkDrowning(playerOnLog);
+    checkCoinPickup();
   }
 
   function render() {
@@ -97,6 +104,7 @@
     renderGrid();
     renderCars();
     renderLogs();
+    renderCoins();
     renderPlayer();
 
     if (isGameOver) {
@@ -112,9 +120,13 @@
     initGameRows();
     furthestRow = player.row;
     score = 0;
+    collectedCoins = 0;
+    coins = [];
     isGameOver = false;
     lastTimestamp = 0;
     updateScoreDisplay();
+    updateCoinDisplay();
+    spawnInitialCoins();
   }
 
   function createPlayer() {
@@ -163,6 +175,43 @@
       laneConfig: config,
       spawnTimer: config ? randomBetween(config.spawnIntervalMin, config.spawnIntervalMax) : 0,
     };
+  }
+
+  function spawnInitialCoins() {
+    coins = [];
+    mapRows.forEach(function (row) {
+      if (row.rowType === "river") {
+        return;
+      }
+      if (Math.random() < COIN_SPAWN_CHANCE) {
+        spawnCoinOnRow(row.index);
+      }
+    });
+  }
+
+  function spawnCoinOnRow(rowIndex) {
+    var row = mapRows[rowIndex];
+    if (!row || row.rowType === "river") {
+      return false;
+    }
+
+    var attempts = 5;
+    while (attempts > 0) {
+      attempts -= 1;
+      var col = Math.floor(Math.random() * GRID_COLS);
+      var occupied = coins.some(function (coin) {
+        return coin.row === rowIndex && coin.col === col;
+      });
+      if (!occupied) {
+        coins.push({
+          row: rowIndex,
+          col: col,
+          value: COIN_VALUE,
+        });
+        return true;
+      }
+    }
+    return false;
   }
 
   // -----------------------------
@@ -387,6 +436,38 @@
     scoreElement.textContent = score.toString().padStart(4, "0");
   }
 
+  function updateCoinDisplay() {
+    if (!coinElement) {
+      return;
+    }
+    coinElement.textContent = collectedCoins.toString().padStart(3, "0");
+  }
+
+  function checkCoinPickup() {
+    var collected = false;
+    coins = coins.filter(function (coin) {
+      if (coin.row !== player.row) {
+        return true;
+      }
+      var playerLeft = player.col;
+      var playerRight = player.col + 1;
+      if (coin.col >= playerLeft && coin.col < playerRight) {
+        collectedCoins += coin.value;
+        collected = true;
+        return false;
+      }
+      return true;
+    });
+
+    if (collected) {
+      updateCoinDisplay();
+      var nextRow = getRandomSafeRowIndex();
+      if (typeof nextRow === "number") {
+        spawnCoinOnRow(nextRow);
+      }
+    }
+  }
+
   // -----------------------------
   // Rendering helpers
   // -----------------------------
@@ -473,6 +554,20 @@
     });
   }
 
+  function renderCoins() {
+    coins.forEach(function (coin) {
+      var centerX = coin.col * TILE_SIZE + TILE_SIZE / 2;
+      var centerY = coin.row * TILE_SIZE + TILE_SIZE / 2;
+      ctx.fillStyle = "#ffe066";
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, TILE_SIZE * 0.25, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#c77d0a";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+  }
+
   function renderGameOverOverlay() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -489,5 +584,16 @@
   // -----------------------------
   function randomBetween(min, max) {
     return Math.random() * (max - min) + min;
+  }
+
+  function getRandomSafeRowIndex() {
+    var safeRows = mapRows.filter(function (row) {
+      return row.rowType !== "river";
+    });
+    if (!safeRows.length) {
+      return null;
+    }
+    var choice = safeRows[Math.floor(Math.random() * safeRows.length)];
+    return choice.index;
   }
 })();
