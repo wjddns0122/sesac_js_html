@@ -1,0 +1,83 @@
+:root {
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #e6f7ff;
+  color: #12343b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fef9a7, #ffb5a7 60%, #7bdff2);
+  padding: 1.5rem;
+}
+
+.game-shell {
+  width: min(540px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 45px rgba(18, 52, 59, 0.25);
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.score-label {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.score-value {
+  font-size: 1.5rem;
+}
+
+canvas {
+  width: 100%;
+  border-radius: 1rem;
+  background: #b9fbc0;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.15);
+  image-rendering: pixelated;
+}
+
+.button-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.button-bar button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: #ffd97d;
+  color: #12343b;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.button-bar button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+}
+
+.button-bar button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
