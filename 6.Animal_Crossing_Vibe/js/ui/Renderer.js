@@ -73,6 +73,7 @@
     drawBackground();
     drawLanes(state);
     drawPlayer(state);
+    drawEagle(state);
     updateFireworks(dt);
     drawFireworks(state);
   }
@@ -188,6 +189,27 @@
     ctx.fillRect(px - tile * 0.18, py - tile * 0.2 + state.player.squash * 5, tile * 0.36, tile * 0.35);
     ctx.fillStyle = state.player.colorPrimary;
     ctx.fillRect(px - tile * 0.25, py - tile * 0.55, tile * 0.5, tile * 0.4);
+  }
+
+  function drawEagle(state) {
+    if (!state.eagle || state.eagle.state === 'inactive') return;
+    const tile = Config.tileSize;
+    const row = state.eagle.currentRow || state.player.targetY + 4;
+    const y = rowToPixel(row, state.cameraY);
+    const x = (Config.virtualWidth * tile) / 2;
+    ctx.fillStyle = '#fdd835';
+    ctx.beginPath();
+    ctx.moveTo(x, y - tile * 0.3);
+    ctx.lineTo(x - tile * 0.8, y - tile * 1.1);
+    ctx.lineTo(x + tile * 0.8, y - tile * 1.1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#3e2723';
+    ctx.fillRect(x - tile * 0.12, y - tile * 1.1, tile * 0.24, tile * 0.7);
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(x + tile * 0.2, y - tile * 1.25, tile * 0.08, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function updateFireworks(dt) {

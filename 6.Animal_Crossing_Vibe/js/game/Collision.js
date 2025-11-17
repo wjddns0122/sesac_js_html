@@ -28,7 +28,6 @@
 
   function checkDanger(state) {
     const idle = (performance.now() - state.player.lastMoveAt) / 1000;
-    if (idle > Config.idleEagleSeconds) return { type: 'EAGLE' };
     if (state.player.targetY < state.dangerLineY) return { type: 'DANGER_LINE' };
     return null;
   }

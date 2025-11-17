@@ -53,7 +53,8 @@
       minGapTiles: Config.RIVER_MIN_GAP_TILES,
       maxGapTiles: settings.riverMaxGap,
       targetDensity: clamp(settings.riverDensity + level * 0.01, 0.35, 0.65),
-      baseSpeed: Config.RIVER_BASE_SPEED + level * Config.RIVER_SPEED_PER_LEVEL
+      baseSpeed: Config.RIVER_BASE_SPEED + level * Config.RIVER_SPEED_PER_LEVEL,
+      maxWaitSeconds: Config.RIVER_MAX_WAIT_SECONDS
     };
     return {
       level,

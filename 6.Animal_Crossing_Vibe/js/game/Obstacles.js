@@ -11,6 +11,9 @@
     LOG_LONG: { length: 3.1 }
   };
 
+  const ROAD_PADDING = 6;
+  const RIVER_PADDING = 8;
+
   function random(min, max) {
     return Math.random() * (max - min) + min;
   }
@@ -59,12 +62,13 @@
 
   function generateRoadPattern(settings) {
     const slots = new Array(settings.patternLength).fill('GAP');
-    const maxCars = Math.max(1, Math.floor(settings.patternLength / (settings.minGapVehicleLengths + 1)));
-    const carCount = clamp(Math.round(settings.patternLength * settings.targetDensity), 1, maxCars);
-    const spacing = Math.max(1, Math.floor(settings.patternLength / carCount));
+    const minCars = 2;
+    const maxCars = Math.max(minCars, Math.floor(settings.patternLength / (settings.minGapVehicleLengths + 1)));
+    const carCount = clamp(Math.round(settings.patternLength * settings.targetDensity), minCars, maxCars);
+    const spacing = settings.patternLength / carCount;
     const jitter = 1;
     for (let i = 0; i < carCount; i += 1) {
-      let position = Math.floor(i * spacing + randomInt(-jitter, jitter));
+      let position = Math.round(i * spacing + randomInt(-jitter, jitter));
       position = (position + settings.patternLength) % settings.patternLength;
       let safety = 0;
       while (slots[position] !== 'GAP' && safety < settings.patternLength) {
@@ -73,10 +77,25 @@
       }
       slots[position] = pickVehicleToken();
     }
-    ensureGapRun(slots, 3);
+    ensureGapRun(slots, Math.max(3, Math.floor(spacing / 2)));
+    const loopLength = Config.virtualWidth + settings.patternLength * Config.ROAD_SLOT_SPACING + ROAD_PADDING * 2;
+    const vehicles = [];
+    slots.forEach((slot, index) => {
+      if (slot === 'GAP') return;
+      const spec = VEHICLE_SPECS[slot] || VEHICLE_SPECS.CAR;
+      vehicles.push({
+        offset: index * Config.ROAD_SLOT_SPACING,
+        length: spec.length,
+        color: spec.color,
+        x: 0
+      });
+    });
     return {
       slots,
-      baseSpeed: settings.baseSpeed
+      baseSpeed: settings.baseSpeed,
+      loopLength,
+      extraSpace: ROAD_PADDING,
+      vehicles
     };
   }
 
@@ -88,21 +107,32 @@
   }
 
   function generateRiverPattern(settings) {
-    const slots = new Array(settings.patternLength).fill('GAP');
-    const maxLogs = Math.max(2, Math.floor(settings.patternLength / (settings.minGapTiles + 1)));
-    const logCount = clamp(Math.round(settings.patternLength * settings.targetDensity), 2, maxLogs);
-    let cursor = randomInt(0, settings.maxGapTiles);
+    const loopLength = Config.virtualWidth + settings.patternLength * Config.RIVER_SLOT_SPACING + RIVER_PADDING * 2;
+    const minLogs = 3;
+    const baseCount = Math.max(minLogs, Math.round(settings.patternLength * settings.targetDensity));
+    const desiredTravel = Math.max(settings.baseSpeed * (settings.maxWaitSeconds || 1) * 4, Config.virtualWidth * 0.75);
+    const maxGapDistance = Math.min(loopLength, desiredTravel);
+    const minForWait = Math.max(minLogs, Math.ceil(loopLength / maxGapDistance));
+    const logCount = Math.max(baseCount, minForWait);
+    const spacing = loopLength / logCount;
+    const logs = [];
     for (let i = 0; i < logCount; i += 1) {
-      const index = Math.floor(cursor) % settings.patternLength;
-      if (slots[index] === 'GAP') {
-        slots[index] = pickLogToken();
-      }
-      cursor += settings.minGapTiles + 1 + randomInt(0, Math.max(0, settings.maxGapTiles - settings.minGapTiles));
+      const offset = (i * spacing + random(-spacing * 0.25, spacing * 0.25) + loopLength) % loopLength;
+      const token = pickLogToken();
+      const spec = LOG_SPECS[token] || LOG_SPECS.LOG_MED;
+      logs.push({
+        offset,
+        length: spec.length,
+        color: Config.palette.logBody,
+        x: 0
+      });
     }
-    ensureGapRun(slots, settings.minGapTiles + 1);
+    enforceLogContinuity(logs, loopLength, maxGapDistance);
     return {
-      slots,
-      baseSpeed: settings.baseSpeed
+      baseSpeed: settings.baseSpeed,
+      loopLength,
+      extraSpace: RIVER_PADDING,
+      logs
     };
   }
 
@@ -113,66 +143,102 @@
     return 'LOG_SHORT';
   }
 
-  function createRoadPattern(pattern, direction) {
-    const slotSpacing = Config.ROAD_SLOT_SPACING;
-    const wrapLength = pattern.slots.length * slotSpacing + Config.virtualWidth + 6;
-    const startX = direction > 0 ? -wrapLength / 2 : Config.virtualWidth + wrapLength / 2;
-    const vehicles = [];
-    pattern.slots.forEach((slot, index) => {
-      if (slot === 'GAP') return;
-      const spec = VEHICLE_SPECS[slot] || VEHICLE_SPECS.CAR;
-      const offset = index * slotSpacing;
-      const x = direction > 0 ? startX + offset : startX - offset;
-      vehicles.push({ x, length: spec.length, color: spec.color });
-    });
+  function createRoadPattern(pattern) {
     return {
-      vehicles,
-      wrapStart: -wrapLength,
-      wrapEnd: Config.virtualWidth + wrapLength,
-      wrapSpan: wrapLength
+      vehicles: pattern.vehicles,
+      loopLength: pattern.loopLength,
+      extraSpace: pattern.extraSpace
     };
   }
 
   function updateRoadLane(lane, dt, speed) {
+    if (!lane.vehicles || !lane.vehicles.length) return;
+    lane.patternPhase = lane.patternPhase ?? 0;
+    const length = lane.loopLength || Config.virtualWidth + 20;
+    const delta = Math.max(0, speed) * dt;
+    lane.patternPhase = (lane.patternPhase + delta) % length;
+    positionRoadVehicles(lane, length);
+  }
+
+  function positionRoadVehicles(lane, forcedLength) {
+    if (!lane.vehicles || !lane.vehicles.length) return;
+    const length = forcedLength || lane.loopLength || Config.virtualWidth + 20;
+    const extra = lane.extraSpace ?? ROAD_PADDING;
     lane.vehicles.forEach((vehicle) => {
-      vehicle.x += speed * dt;
-      if (speed > 0 && vehicle.x > lane.wrapEnd) {
-        vehicle.x -= lane.wrapSpan;
-      } else if (speed < 0 && vehicle.x < lane.wrapStart - vehicle.length) {
-        vehicle.x += lane.wrapSpan;
+      const trackPos = (vehicle.offset + lane.patternPhase) % length;
+      if (lane.direction > 0) {
+        vehicle.x = trackPos - extra;
+      } else {
+        vehicle.x = Config.virtualWidth + extra - trackPos;
       }
     });
   }
 
-  function createRiverPattern(pattern, direction) {
-    const slotSpacing = Config.RIVER_SLOT_SPACING;
-    const wrapLength = pattern.slots.length * slotSpacing + Config.virtualWidth + 6;
-    const startX = direction > 0 ? -wrapLength / 2 : Config.virtualWidth + wrapLength / 2;
-    const logs = [];
-    pattern.slots.forEach((slot, index) => {
-      if (slot === 'GAP') return;
-      const spec = LOG_SPECS[slot] || LOG_SPECS.LOG_MED;
-      const offset = index * slotSpacing;
-      const x = direction > 0 ? startX + offset : startX - offset;
-      logs.push({ x, length: spec.length, color: Config.palette.logBody });
-    });
+  function createRiverPattern(pattern) {
     return {
-      logs,
-      wrapStart: -wrapLength,
-      wrapEnd: Config.virtualWidth + wrapLength,
-      wrapSpan: wrapLength
+      logs: pattern.logs,
+      loopLength: pattern.loopLength,
+      extraSpace: pattern.extraSpace
     };
   }
 
   function updateRiverLane(lane, dt, speed) {
+    if (!lane.logs || !lane.logs.length) return;
+    lane.patternPhase = lane.patternPhase ?? 0;
+    const length = lane.loopLength || Config.virtualWidth + 20;
+    const delta = Math.max(0, speed) * dt;
+    lane.patternPhase = (lane.patternPhase + delta) % length;
+    positionRiverLogs(lane, length);
+  }
+
+  function positionRiverLogs(lane, forcedLength) {
+    if (!lane.logs || !lane.logs.length) return;
+    const length = forcedLength || lane.loopLength || Config.virtualWidth + 20;
+    const extra = lane.extraSpace ?? RIVER_PADDING;
     lane.logs.forEach((log) => {
-      log.x += speed * dt;
-      if (speed > 0 && log.x > lane.wrapEnd) {
-        log.x -= lane.wrapSpan;
-      } else if (speed < 0 && log.x < lane.wrapStart - log.length) {
-        log.x += lane.wrapSpan;
+      const trackPos = (log.offset + lane.patternPhase) % length;
+      if (lane.direction > 0) {
+        log.x = trackPos - extra;
+      } else {
+        log.x = Config.virtualWidth + extra - trackPos;
       }
     });
+  }
+
+  function ensureRiverVisibility(lane) {
+    if (!lane.logs || !lane.logs.length) return;
+    const maxIterations = lane.logs.length * 2;
+    for (let i = 0; i < maxIterations; i += 1) {
+      const visible = lane.logs.some((log) => log.x + log.length > -1 && log.x < Config.virtualWidth + 1);
+      if (visible) return;
+      lane.patternPhase = (lane.patternPhase + (lane.loopLength || Config.virtualWidth + 20) / lane.logs.length) % (lane.loopLength || Config.virtualWidth + 20);
+      positionRiverLogs(lane);
+    }
+  }
+
+  function enforceLogContinuity(logs, loopLength, maxGapDistance) {
+    if (!logs.length) return;
+    logs.sort((a, b) => a.offset - b.offset);
+    let i = 0;
+    let added = 0;
+    const maxAdditional = logs.length;
+    while (i < logs.length && added <= maxAdditional) {
+      const current = logs[i];
+      const next = logs[(i + 1) % logs.length];
+      const gap = ((next.offset - current.offset) + loopLength) % loopLength;
+      if (gap <= maxGapDistance) {
+        i += 1;
+        continue;
+      }
+      const insertOffset = (current.offset + Math.min(gap / 2, maxGapDistance * 0.9)) % loopLength;
+      logs.splice(i + 1, 0, {
+        offset: insertOffset,
+        length: LOG_SPECS.LOG_MED.length,
+        color: Config.palette.logBody,
+        x: 0
+      });
+      added += 1;
+    }
   }
 
   function initRailData() {
@@ -244,6 +310,9 @@
     generateRiverPattern,
     createRiverPattern,
     updateRiverLane,
+    positionRoadVehicles,
+    positionRiverLogs,
+    ensureRiverVisibility,
     initRailData,
     updateRail,
     removeCoin

@@ -21,7 +21,15 @@
     currentWorldId: 'classic',
     highScoreMarkerRow: null,
     hasBeatenHighScore: false,
-    pauseStartTime: null
+    pauseStartTime: null,
+    eagle: {
+      state: 'inactive',
+      progress: 0,
+      startRow: 0,
+      currentRow: 0,
+      targetRow: 0,
+      startTime: 0
+    }
   };
 
   function init() {
@@ -55,6 +63,14 @@
     state.pauseStartTime = null;
     state.player.lastMoveAt = performance.now();
     state.dangerLineY = state.player.targetY - Config.maxRowsBehind;
+    state.eagle = {
+      state: 'inactive',
+      progress: 0,
+      startRow: 0,
+      currentRow: 0,
+      targetRow: 0,
+      startTime: 0
+    };
   }
 
   function startRun() {
@@ -106,6 +122,7 @@
       return;
     }
 
+    handleIdleBehaviors();
     collectCoins();
     updateCamera();
     moveDangerLine(dt);
@@ -143,6 +160,7 @@
     if (!lane) return;
     if (lane.solidTiles && lane.solidTiles[Math.round(nextX)]) return;
     Player.commandMove(state.player, delta.dx, delta.dy);
+    resetEagle();
     postMove(delta);
   }
 
@@ -206,7 +224,9 @@
 
   function updateCamera() {
     const desired = state.player.targetY - Config.cameraRowsFromBottom;
-    if (desired > state.cameraY) state.cameraY = desired;
+    if (desired <= state.cameraY) return;
+    const delta = desired - state.cameraY;
+    state.cameraY += delta * Config.cameraFollowLerp;
   }
 
   function emitMeta() {
@@ -217,6 +237,55 @@
   function getObstacleSpeedMultiplier() {
     const tier = Math.floor(Math.max(0, state.score) / 100);
     return Config.OBSTACLE_BASE_SPEED_MULTIPLIER + tier * Config.OBSTACLE_SPEED_STEP_PER_100;
+  }
+
+  function handleIdleBehaviors() {
+    if (!state.player) return;
+    const idleSeconds = (performance.now() - state.player.lastMoveAt) / 1000;
+    if (idleSeconds > Config.idleCameraPushDelay) {
+      const desired = state.player.targetY - Config.idleCameraRows;
+      if (desired > state.cameraY) state.cameraY = desired;
+    }
+    if (idleSeconds > Config.eagleWarningDelay && state.eagle.state === 'inactive') {
+      triggerEagleWarning();
+    }
+    if (state.eagle.state === 'warning') {
+      const elapsed = (performance.now() - state.eagle.startTime) / 1000;
+      const duration = Config.eagleApproachDuration;
+      state.eagle.progress = Math.min(1, elapsed / duration);
+      state.eagle.currentRow = lerp(state.eagle.startRow, state.eagle.targetRow, state.eagle.progress);
+      if (state.eagle.progress >= 1) {
+        state.eagle.state = 'strike';
+        endRun('EAGLE');
+      }
+    }
+  }
+
+  function triggerEagleWarning() {
+    state.eagle = {
+      state: 'warning',
+      progress: 0,
+      startRow: state.player.targetY + 6,
+      currentRow: state.player.targetY + 6,
+      targetRow: state.player.targetY + 0.5,
+      startTime: performance.now()
+    };
+  }
+
+  function resetEagle() {
+    if (state.eagle.state === 'inactive') return;
+    state.eagle = {
+      state: 'inactive',
+      progress: 0,
+      startRow: 0,
+      currentRow: 0,
+      targetRow: 0,
+      startTime: 0
+    };
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
   }
 
   function getState() {
