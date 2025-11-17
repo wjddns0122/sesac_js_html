@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* 여기에 디자인 들어감 */
+        h1 {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">JS 헬로우 월드</h1>
+    <button onclick="sayHello()">헬로우 버튼</button>
+    <script>
+        console.log("Hello, JS");
+
+        function sayHello() {
+            // console.log("Hello 함수");
+            h1 = document.getElementById('title');
+            h1.style.color = 'red';
+        }
+    </script>
+</body>
+</html>
