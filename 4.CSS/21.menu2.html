@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        ul {
+            list-style-type: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+            border: 1px solid #555;
+        }
+
+        li {
+            flex: 1;   /* flex를 꽉 채워라 */
+            width: 100px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+
+        li a {
+            display: block;     /* 영역 전체를 클릭 가능하게 함 */
+            text-decoration: none;
+            padding: 8px 16px;
+        }
+
+        li a:hover {
+            background-color: #555;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li><a href="">Home</a></li>
+        <li><a href="">News</a></li>
+        <li><a href="">Contact</a></li>
+        <li><a href="">About</a></li>
+    </ul>
+</body>
+</html>
