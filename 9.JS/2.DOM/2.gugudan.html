@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>구구단 콘솔</h1>
+    <input id="userInput" type="number" placeholder="단을 입력하시오">
+    <!-- 사용자가 입력한 값을 가져오기
+     근데 HTML, CSS는 표현을 위한 언어라 사용자가 입력한 값을 가져오지 못하네!
+     그럼 어카노 -> 내가 원하는 바로 내맘대로, 브라우저 내애서 할려면 JS 쓰기
+      -->
+    <button onclick="gugudan()">구구단 출력</button>
+    <div id="result">
+
+    </div>
+
+    <!-- 위는 HTML로 정해진 문법과 표현에 따라 각종 표현기법을 정의하는곳 -->
+
+    <!-- 아래는 프로그래밍 언어로 각종 연산을 내맘대로 하는곳 -->
+    <script>
+        function gugudan() {
+            // 인자를 미리 HTML에서 가져다가 전달할 수 없음..
+            // 내가 여기서 사용자가 HTML 코드 어딘가에선가 입력한 글자를 가져와야함
+            let dan = document.getElementById("userInput")
+            // console.log(dan)
+            // 난 값을 원했으나 돌아온건 요소(Element) 였음. <input> 태그 전체를 가져옴
+            // 그럼 난 여기에서 값을 구해오면 됨..
+            let dan_input = dan.value;
+            // console.log(dan_input)
+            // console.log(result)
+            let result = document.getElementById("result");
+            result.innerHTML = ""
+            
+            for (let i = 1; i <= 9; i++) {
+                // console.log(dan_input + " x " + i + " = " + dan_input * i);
+                // 이제 결과를 콘솔로그에 찍을게 아니고 어떻게 하면 우리 화면에 찍을까??
+                // document.write(dan_input + " x " + i + " = " + dan_input * i + "<br>")
+                // <BR>을 찍는게 아니라 그 태그는 HTML이다.
+                // result.textContent += dan_input + " x " + i + " = " + dan_input * i + "<br>";
+                result.innerHTML += dan_input + " x " + i + " = " + dan_input * i + "<br>";
+                // 아 이결과를 출력하기 위해서는 이전 결과를 지워야 하는구나
+                // 그래서, 이 반복문을 실행하기 전에, 화면에 해당 div 안에 글자를 지워야 겠구나
+            }
+        }
+    </script>
+</body>
+</html>
