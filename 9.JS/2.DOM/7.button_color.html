@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        button {
+            border: 2px solid rgb(0, 255, 149);
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">헬로우 DOM 버튼</h1>
+    <button onclick="changeColor()">색상바꾸기(빨간/노란배경)</button><br>
+    <button onclick="changeBlueColor()" style="margin-top: 10px;">색상바꾸기(파랑/하늘배경)</button><br>    
+    <button onclick="changeinitial()" style="margin-top: 10px;">초기화 버튼</button>
+
+    <script>
+        const heading = document.getElementById("title");
+        // 목표 : 헤딩을 가져다가 색상(red)을 바꾼다.
+        function changeColor() {
+            // console.log("색상바꾸기");
+            // let heading = document.getElementById('title');     // '' 와 "" 구분 필요 없지만 일관성 지키기
+            // let heading = document.getElementById("title");
+            // console.log(heading);
+
+            // CSS를 떠올려보고 유추... ㅎㅅㅎ
+            heading.style.color = "red";
+
+            // 배경색 바꾸기
+            heading.style.backgroundColor = "yellow";
+
+            // 넓이 지정
+            heading.style.width = "300px";
+        }
+
+        function changeBlueColor() {
+            // let heading = document.getElementById("title");
+            heading.style.color = "blue";
+            heading.style.backgroundColor = "skyblue";
+            heading.style.width = "300px";
+        }
+
+        function changeinitial() {
+            // let heading = document.getElementById("title");
+
+            // heading.style.color = "";
+            // heading.style.backgroundColor = "";
+            // heading.style.width = "";
+
+            heading.removeAttribute("style");
+        }
+    </script>
+</body>
+</html>

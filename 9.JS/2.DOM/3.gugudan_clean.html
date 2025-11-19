@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>구구단 콘솔</h1>
+    <input id="userInput" type="number" placeholder="단을 입력하시오">
+    <button onclick="gugudan()">구구단 출력</button>
+    <div id="result"></div>
+    <script>
+        function gugudan() {
+            let dan_input = document.getElementById("userInput").value
+            
+            let result = document.getElementById("result");
+            result.innerHTML = ""       // 빈칸으로 채운다.
+
+            for (let i = 1; i <= 9; i++) {
+                result.innerHTML += dan_input + " x " + i + " = " + dan_input * i + "<br>";
+            }
+        }
+    </script>
+</body>
+</html>

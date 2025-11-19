@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>헬로우 DOM</h1>
+    <button onclick="sayHello()">Hello</button>
+    <div id="result"></div>     <!-- 빈 div 만들기 -->
+    <script>
+        function sayHello() {
+            result = document.getElementById("result");
+            result.innerHTML = "<b>say 헬로우</b>";     // 문자를 파싱함
+            // result.outerHTML = "<b>say 헬로우</b>";      <b>say 헬로우...</b>
+            // result.textContent = "<b>say 헬로우</b>";    문자만 보여줌
+
+            // 그래서 공통적으로, document에 쓰기 위한  다양한 함수가 있음
+        }
+    </script>
+</body>
+</html>
