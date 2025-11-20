@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number</title>
+    <style>
+        h3 {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Guess the Number (1~100)</h1>
+    <input type="text" id="guessInput" placeholder="Enter your guess">
+    <button onclick="counting()">Guess</button>
+    <div id="result"></div>
+    <h3>Guess history</h3>
+    <div id="history"></div>
+
+    <script>
+        const n = Math.floor(Math.random() * 101); 
+        let attempt = []; 
+
+        function counting() {
+            const guessInput = document.getElementById("guessInput"); 
+            const resultDiv = document.getElementById("result"); 
+            const historyDiv = document.getElementById("history");
+
+            let m = parseInt(guessInput.value);  
+
+            let result = ''
+            if (m < n) {
+                result = "Too low!";
+            } else if (m > n) {
+                result = "Too high!";
+            } else {
+                result = "Correct! You guessed the number.";
+            }
+
+            resultDiv.innerHTML = result;
+            
+            attempt.push(`You Guessed ${m}: ${result}`);
+            
+            historyDiv.innerHTML = '';
+            attempt.forEach((attempt, index) => {
+                historyDiv.innerHTML += `${index + 1}. ${attempt}<br>`;
+            });
+            
+            guessInput.value = "";
+        }
+
+        
+    </script>
+</body>
+</html>

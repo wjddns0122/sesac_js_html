@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>버튼을 통한 숫자 제어</h1>
+    <input type="text" value="" placeholder="숫자/글자 아무거나 입력하시오">
+    <div id="result">0</div>
+    <div>
+        <button onclick="number_inc()">+1</button>
+        <button onclick="number_dec()">-1</button>
+    </div>
+
+    <script>
+        function number_inc() {
+            // console.log('+1 버튼 눌름');
+            // 1. DOM을 가져온다
+            let resultDiv = document.getElementById("result");
+            // console.log(resultDiv.innerText)
+            // 2. 계산한다
+            incResult = Number(resultDiv.innerText) + 1;        // Number 안쓰면 String + int라 글자가 더해진다.
+            // 3. 다시 DOM에다가 결과를 쓴다
+            resultDiv.innerText = incResult;
+        }
+
+        function number_dec() {
+            // console.log('-1 버튼 눌름');
+            let resultDiv = document.getElementById("result");
+            decResult = Number(resultDiv.innerText) - 1;
+            resultDiv.innerText = decResult;
+        }
+    </script>
+</body>
+</html>

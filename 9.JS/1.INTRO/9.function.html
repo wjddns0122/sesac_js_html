@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>함수 제대로 이해하기</h1>
+    <script>
+        let a = 2;
+        let b = 3;
+
+        function add(a, b) {
+            let sum = a + b;
+            return sum;
+        }
+
+        function sub(a, b) {
+            let result = a - b;
+            return result;
+        }
+
+        function mul(a, b) {
+            let result = a * b;
+            return result;
+        }
+
+        function div(a, b) {
+            let result = a / b;
+            return result;
+        }
+
+        console.log(add(2, 3));
+        console.log(sub(5, 3));
+        console.log(mul(5, 9));
+        console.log(div(10, 2));
+
+        // 변수는?? 모든걸 다 담을 수 있다
+        // ㅣet a = 숫자/글자/불리언/널/undefined/function도 담을 수 있음..
+
+        let multiply = mul;
+        console.log(multiply(3, 4));
+
+        let multiplyagain = function(x, y) {    //함수를 만들면서 담을 수도 있음.
+            return x * y;
+        }
+
+        console.log(multiplyagain(5, 6));
+
+        let multiplyagain2 = (x, y) => x * y;   // arrow function
+        console.log(multiplyagain2(7, 7));
+
+        let division = div;
+        console.log(division(5, 5));
+
+        let divisionagain = function(x, y) {
+            return x / y;
+        }
+
+        console.log(divisionagain(100, 10));
+
+        let divisionagain2 = (x, y) => x / y;
+        
+    </script>
+</body>
+</html>

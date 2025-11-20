@@ -10,6 +10,14 @@ for (let n = 0; n < 5; n ++) {
     console.log(str)
 }
 
+function paintTree1(height) {
+    str = ""
+    for (let n = 0; n < height + 1; n++) {
+        str += "*"
+        console.log(str);
+    }
+}
+
 // 2번
 for(let i = 5; i >= 1; i --) {
     console.log("*".repeat(i));
@@ -38,3 +46,4 @@ function printTree4(height) {
 
 // let height = 5;
 printTree4(height)
+
