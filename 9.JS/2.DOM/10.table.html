@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>테이블을 DOM 으로 제어해보기</h1>
+    <table>
+        <tr>
+            <td>셀 1</td>
+            <td>셀 2</td>
+            <td>셀 3</td>
+        </tr>
+        <tr>
+            <td>셀 4</td>
+            <td>셀 5</td>
+            <td>셀 6</td>
+        </tr>
+        <tr>
+            <td>셀 7</td>
+            <td>셀 8</td>
+            <td>셀 9</td>
+        </tr>
+    </table>
+
+    <button onclick="changeCellColor()">셀 색상 모두 변경</button>
+    <button onclick="changeGreenColor()">짝수셀 색상 모두 변경 (초록)</button>
+    <button onclick="changeOrangeColor()">홀수셀 색상 모두 변경 (주황)</button>
+    <script>
+        function changeCellColor() {
+            let cells = document.getElementsByTagName("td");
+            // 모든 td들이 다 온다.. 그럼 이건 어디에 담겨서 어떤 구조들로 올까?
+            // 쉬운말로는 리스트. 전문 개발용어로는 이걸 배열(Array) 라고 부른다
+            // console.log(cells);
+            // cells[0].style.backgroundColor = "lightblue";
+            // cells[1].style.backgroundColor = "lightblue";
+
+            // 미션1. 반복문으로 이걸 구현한다
+            // for (let i = 0; i < 2; i++) {       // 하드 코딩 노노
+            //     cells[i].style.backgroundColor = "lightblue";
+            // }
+
+            for (let i = 0; i < cells.length; i++) {       // 하드 코딩 노노
+                cells[i].style.backgroundColor = "lightblue";
+            }
+        }
+
+        function changeGreenColor() {
+            let cells = document.getElementsByTagName("td");
+
+            for (let i = 0; i < cells.length; i++) {
+                if (i % 2 == 0) {
+                    cells[i].style.backgroundColor = "";
+                } else {
+                    cells[i].style.backgroundColor = "green";
+                }
+            }
+        }
+
+        function changeOrangeColor() {
+            let cells = document.getElementsByTagName("td");
+
+            for (let i = 0; i < cells.length; i++) {
+                if (i % 2 == 0) {
+                    cells[i].style.backgroundColor = "orange";
+                } else {
+                    cells[i].style.backgroundColor = "";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

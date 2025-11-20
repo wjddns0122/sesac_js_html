@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>문법 배우기</h1>
+    <script>
+        // 1. 원래 쓰던 기본 문법 - 반복 횟수가 일정할때
+        for(let i = 0; i < 5; i ++) {
+            console.log(i);
+        }
+
+        // 2. 기본 문법으로 리스트(배열(array)) 순회하기
+        let fruits = ["apple", "banana", "cherry"]
+        for (let i = 0; i < fruits.length; i++) {
+            console.log(fruits[i]);
+        }
+        // 이터레이션(iteration), 이터레이트(iterate) = 리스트를 반복 순회
+
+        // 밑에서부터가 Modern JS 스타일
+        for (let fruit of fruits) {
+            console.log(fruit);
+        }
+
+        for (let f of fruits) {
+            console.log(f);
+        }
+
+        for (let key in fruits) {       // key가 index라서.. index로 레퍼런싱(reference, referencing = 참조한다)
+            console.log(fruits[key]);
+        }
+
+        let person = {
+            name: "john",
+            age: 30,
+            city: "Seoul"
+        };
+
+        for(let key in person) {
+            console.log(key, ": ", person[key]);
+        }
+
+        // more more Modern JS 스타일로
+        // forEach 라는게 있음
+        // 고차함수(High-order Function): 인자를 함수로 받는 함수
+        let numbers = [1, 2, 3, 4, 5];
+
+        numbers.forEach(function (number, index) {
+            console.log("Index: " + index + ", Value: " + number);
+        });
+
+        fruits.forEach(function (number, index) {
+            console.log("Index: " + index + ", Value: " + number);
+        });
+    </script>
+</body>
+</html>

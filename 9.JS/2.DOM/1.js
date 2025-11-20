@@ -1,13 +1,18 @@
 
 // 1번
-for(let i = 1; i <= 5; i++) {
-    console.log("*".repeat(i))
-}
+// for(let i = 1; i <= 5; i++) {
+//     console.log("*".repeat(i));
+// }
 
+str = ""
+for (let n = 0; n < 5; n ++) {
+    str += "*"
+    console.log(str)
+}
 
 // 2번
 for(let i = 5; i >= 1; i --) {
-    console.log("*".repeat(i))
+    console.log("*".repeat(i));
 }
 
 // 3번

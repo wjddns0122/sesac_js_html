@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>고차함수: 인자를 함수로 받는 함수</h1>
+    <script>
+        // map, reduce, filter 등등..
+        let numbers = [1, 2, 3, 4, 5, 6, 7];
+
+        let squares = numbers.map(
+            function hello(num) {
+                return num * num;
+            }
+        )
+
+        console.log(squares)
+        // 여기 위에까지가.. 함수를 인자로 받는 함수를 고차함수라고 한다
+
+        // 근데 이걸, 구현하다보니 쓸대 없는게 많아서
+        // 하나둘씩 쓸대없는걸 없애면서.. 익명함수, 화살표 함수(arrow function)
+
+        // 익명함수 (함수 이름이 필요가 없으니까 없애버리기)
+        let squares2 = numbers.map(
+            function (num) {
+                return num * num;
+            }
+        )
+
+        console.log(squares2)
+        
+        // 화살표 함수 (함수가 이름이 필요없으니 그냥 없애버리자.)
+        let squares3 = numbers.map(
+            (num) => {
+                return num * num;
+            }
+        )
+
+        console.log(squares3)
+
+        // 결론적으로 쭉 발전시키면
+        let squares4 = numbers.map((num) => num * num);
+        console.log(squares4)
+
+        // 고차함수중에 filter는 골라냄
+
+        let evenNumbers = numbers.filter((num) => num % 2 == 0);
+        console.log(evenNumbers);
+
+        let oddNumbers = numbers.filter((num) => num % 2 == 1);
+        console.log(oddNumbers);
+
+        // 위에 화살표 함수가 거꾸로 돌아가면?
+
+        let evenNumbers2 = numbers.filter(
+            function getEvenNumber(num) {
+                let even = num % 2 == 0;
+                return even;
+            }
+        )
+
+        console.log(evenNumbers2)
+
+        let evenNumbers3 = numbers.filter(n => n % 2 == 0)
+        console.log(evenNumbers3)
+    </script>
+</body>
+</html>
