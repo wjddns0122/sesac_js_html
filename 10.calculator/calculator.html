@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-    <div class="container" id="result">0</div>
+    <div class="container" id="result"></div>
     <div class="grid-container">
         <div class="grid-icon" onclick="addToResult('+')">+</div>
         <div class="grid-icon" onclick="addToResult('-')">-</div>
@@ -42,7 +42,7 @@
         <div class="grid-icon" onclick="addToResult('7')">7</div>
         <div class="grid-icon" onclick="addToResult('8')">8</div>
         <div class="grid-icon" onclick="addToResult('9')">9</div>
-        <div class="grid-icon" onclick="calculate()">=</div>
+        <div class="grid-icon" onclick="addToResult('=')">=</div> 
         <div class="grid-icon" onclick="addToResult('4')">4</div>
         <div class="grid-icon" onclick="addToResult('5')">5</div>
         <div class="grid-icon" onclick="addToResult('6')">6</div>
@@ -64,13 +64,18 @@
                 if (firstNumber === '') {
                     firstNumber = resultDiv.innerHTML;  // 첫 번째 숫자 저장
                     operator = value;  // 연산자 저장
-                    resultDiv.innerHTML = '0';  // 숫자 부분을 0으로 초기화
+                    resultDiv.innerHTML = '';  // 숫자 부분을 초기화
+                } else if (firstNumber !== '' && resultDiv.innerHTML !== '0') {
+                    // 이미 첫 번째 숫자가 있고, 결과값이 표시된 상태에서 연산자를 누르면 계산을 이어서 할 수 있도록
+                    secondNumber = resultDiv.innerHTML;     // 두 번째 숫자를 저장하고
+                    calculate();    // 계산
+                    operator = value;   // 연산자 저장
                 }
             } else if (value === '=') {
                 secondNumber = resultDiv.innerHTML;  // 두 번째 숫자 저장
                 calculate();  // 계산 실행
             } else {
-                if (resultDiv.innerHTML === '0') {
+                if (resultDiv.innerHTML === '0' || resultDiv.innerHTML === firstNumber) {
                     resultDiv.innerHTML = value;  // 첫 번째 숫자 입력 시
                 } else {
                     resultDiv.innerHTML += value;  // 숫자 이어서 입력
@@ -103,7 +108,11 @@
                         result = parseFloat(firstNumber) * parseFloat(secondNumber);
                         break;
                     case '/':
-                        result = parseFloat(firstNumber) / parseFloat(secondNumber);
+                        if (parseFloat(secondNumber) === 0) {
+                            result = 'Error';  // 0으로 나누는 오류 처리
+                        } else {
+                            result = parseFloat(firstNumber) / parseFloat(secondNumber);
+                        }
                         break;
                     default:        // 아닐 경우 에러 처리
                         result = 'error';
