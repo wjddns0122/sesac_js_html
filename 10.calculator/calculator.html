@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            height: 50px;
+            border: 1px solid rgb(191, 187, 187);
+            border-radius: 5px;
+            font-size: 45px;
+            padding: 5px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 10px;
+            background-color: white;
+            margin-top: 10px;
+        }
+
+        .grid-icon {
+            background-color: rgb(191, 187, 187);
+            border: 1px solid #000000;
+            border-radius: 5px;
+            text-align: center;
+            padding: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="result">0</div>
+    <div class="grid-container">
+        <div class="grid-icon" onclick="addToResult('+')">+</div>
+        <div class="grid-icon" onclick="addToResult('-')">-</div>
+        <div class="grid-icon" onclick="addToResult('*')">*</div>
+        <div class="grid-icon" onclick="addToResult('/')">/</div>
+        <div class="grid-icon" onclick="addToResult('7')">7</div>
+        <div class="grid-icon" onclick="addToResult('8')">8</div>
+        <div class="grid-icon" onclick="addToResult('9')">9</div>
+        <div class="grid-icon" onclick="addToResult('=')">=</div> 
+        <div class="grid-icon" onclick="addToResult('4')">4</div>
+        <div class="grid-icon" onclick="addToResult('5')">5</div>
+        <div class="grid-icon" onclick="addToResult('6')">6</div>
+        <div class="grid-icon" onclick="clearDisplay()">C</div>
+        <div class="grid-icon" onclick="addToResult('1')">1</div>
+        <div class="grid-icon" onclick="addToResult('2')">2</div>
+        <div class="grid-icon" onclick="addToResult('3')">3</div>
+        <div class="grid-icon" onclick="addToResult('0')">0</div>
+    </div>
+    <script>
+        let firstNumber = '';   // 첫 번째 숫자
+        let operator = '';      // 연산자
+        let secondNumber = '';  // 두 번째 숫자
+        
+        function addToResult(value) {
+            let resultDiv = document.getElementById("result");
+
+            if (['+', '-', '*', '/'].includes(value)) {
+                if (firstNumber === '') {
+                    firstNumber = resultDiv.innerHTML;  // 첫 번째 숫자 저장
+                    operator = value;  // 연산자 저장
+                    resultDiv.innerHTML = '0';  // 숫자 부분을 0으로 초기화
+                }
+            } else if (value === '=') {
+                secondNumber = resultDiv.innerHTML;  // 두 번째 숫자 저장
+                calculate();  // 계산 실행
+            } else {
+                if (resultDiv.innerHTML === '0') {
+                    resultDiv.innerHTML = value;  // 첫 번째 숫자 입력 시
+                } else {
+                    resultDiv.innerHTML += value;  // 숫자 이어서 입력
+                }
+            }
+        }
+
+        function clearDisplay() {
+            firstNumber = '';
+            operator = '';
+            secondNumber = '';
+            document.getElementById("result").innerHTML = '0';
+        }
+
+        function calculate() {
+            let resultDiv = document.getElementById("result");
+
+            if (firstNumber && secondNumber && operator) {
+                let result;
+                switch (operator) {
+                    case '+':
+                        result = parseFloat(firstNumber) + parseFloat(secondNumber);
+                        break;
+                    case '-':
+                        result = parseFloat(firstNumber) - parseFloat(secondNumber);
+                        break;
+                    case '*':
+                        result = parseFloat(firstNumber) * parseFloat(secondNumber);
+                        break;
+                    case '/':
+                        result = parseFloat(firstNumber) / parseFloat(secondNumber);
+                        break;
+                    default:
+                        result = 'error';
+                }
+                resultDiv.innerHTML = result;
+                firstNumber = result.toString();
+                operator = '';
+                secondNumber = '';
+            }
+        }
+    </script>
+</body>
+</html>

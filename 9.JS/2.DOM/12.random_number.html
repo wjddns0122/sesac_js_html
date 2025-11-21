@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guess the Number</title>
     <style>
-        h3 {
+        h2 {
             margin-top: 50px;
+        }
+        #history {
+            margin-left: 30px;
+        }
+        #result {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -15,7 +21,7 @@
     <input type="text" id="guessInput" placeholder="Enter your guess">
     <button onclick="counting()">Guess</button>
     <div id="result"></div>
-    <h3>Guess history</h3>
+    <h2>Guess history</h2>
     <div id="history"></div>
 
     <script>
@@ -29,7 +35,7 @@
 
             let m = parseInt(guessInput.value);  
 
-            let result = ''
+            let result = '';
             if (m < n) {
                 result = "Too low!";
             } else if (m > n) {
@@ -46,7 +52,7 @@
             attempt.forEach((attempt, index) => {
                 historyDiv.innerHTML += `${index + 1}. ${attempt}<br>`;
             });
-            
+
             guessInput.value = "";
         }
 
