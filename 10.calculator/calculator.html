@@ -88,9 +88,11 @@
         function calculate() {
             let resultDiv = document.getElementById("result");
 
+
+            // 만약 첫번째 숫자와 두번쨰 숫자 연산자까지 값을 받았다면
             if (firstNumber && secondNumber && operator) {
-                let result;
-                switch (operator) {
+                let result;     // 결과값을 초가화 해주고
+                switch (operator) {     // switch - case 문을 통해 매개변수인 연산자를 받아주고 Case 문에 연산자 값을 저장해준 다음 +인지. -인지. *인지, /인지 받으면 결과를 출력한다
                     case '+':
                         result = parseFloat(firstNumber) + parseFloat(secondNumber);
                         break;
@@ -103,9 +105,11 @@
                     case '/':
                         result = parseFloat(firstNumber) / parseFloat(secondNumber);
                         break;
-                    default:
+                    default:        // 아닐 경우 에러 처리
                         result = 'error';
                 }
+
+                // 다시 결과값을 넣어주고 결과겂을 첫번쨰 숫자로 넣어주고 문자열 처리를 해준다.
                 resultDiv.innerHTML = result;
                 firstNumber = result.toString();
                 operator = '';
