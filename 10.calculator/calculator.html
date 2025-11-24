@@ -99,19 +99,19 @@
                 let result;     // 결과값을 초가화 해주고
                 switch (operator) {     // switch - case 문을 통해 매개변수인 연산자를 받아주고 Case 문에 연산자 값을 저장해준 다음 +인지. -인지. *인지, /인지 받으면 결과를 출력한다
                     case '+':
-                        result = parseFloat(firstNumber) + parseFloat(secondNumber);
+                        result = parseInt(firstNumber) + parseInt(secondNumber);
                         break;
                     case '-':
-                        result = parseFloat(firstNumber) - parseFloat(secondNumber);
+                        result = parseInt(firstNumber) - parseInt(secondNumber);
                         break;
                     case '*':
-                        result = parseFloat(firstNumber) * parseFloat(secondNumber);
+                        result = parseInt(firstNumber) * parseInt(secondNumber);
                         break;
                     case '/':
-                        if (parseFloat(secondNumber) === 0) {
+                        if (parseInt(secondNumber) === 0) {
                             result = 'Error';  // 0으로 나누는 오류 처리
                         } else {
-                            result = parseFloat(firstNumber) / parseFloat(secondNumber);
+                            result = parseInt(firstNumber) / parseInt(secondNumber);
                         }
                         break;
                     default:        // 아닐 경우 에러 처리

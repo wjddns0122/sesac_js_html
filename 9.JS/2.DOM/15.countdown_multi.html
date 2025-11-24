@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>카운트다운 타이머</h1>
+    <input type="number" id="timeInput" placeholder="초 입력">
+    <button onclick="countdown()" id="startButton">시작</button>
+    <div id="display"></div>
+    <script>
+        function countdown() {
+            let timeInput = document.getElementById("timeInput").value;
+            const display = document.getElementById("display");
+
+            // 새로운 DOM 요소 추가 하기
+            const timerElement = document.createElement('p');
+            timerElement.innerHTML = "새로운 돔이에요";
+            display.appendChild(timerElement);
+            
+            let timerId = setInterval(() => {
+                timeInput--;
+                if (timeInput <= 0) {
+                    clearInterval(timerId);
+                    timerElement.innerHTML = `Time Out!`;
+                } else {
+                    timerElement.innerHTML = `${timeInput}초 남았습니다.`;
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

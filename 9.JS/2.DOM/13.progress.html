@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        input {
+            width: 150px;
+        }
+        #progressBar {
+            width: 100%;
+            background-color: #f3f3f3;
+        }
+        #progress {
+            width: 1px;
+            height: 30px;
+            background-color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <h1>프로그레스 바 타이머</h1>
+    <input type="number" placeholder="초를 입력하세요" min="2" max="10" id="timeInput">
+    <button id="startButton" onclick="startTimer()">시작</button>
+    <button id="resetButton">초기화</button>
+    <div id="progressBar">
+        <div id="progress"></div>
+    </div>
+    <script>
+        let timerId;    // 전역 변수로 timerId 선언
+
+        function startTimer() {
+            if (timerId) {
+                clearInterval(timerId);  // 이전 타이머를 중단
+            }
+
+            const timeInput = document.getElementById("timeInput").value;
+            const progressBar = document.getElementById("progress");
+            const startButton = document.getElementById("startButton");
+            // startButton.disabled = true;
+            
+            console.log("클릭됨", timeInput);
+            let progress = (100 / timeInput);
+
+            let timePassed = 0;
+            timerId = setInterval(() => {  // 함수 내에서 timerId 재선언하지 않음
+                timePassed++;
+                progress = (100 / timeInput) * timePassed;
+                console.log("progress: ", progress);
+                progressBar.style.width = `${progress}%`;
+
+                if (progress >= 100) {
+                    clearInterval(timerId);
+                    // startButton.disabled = false;
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

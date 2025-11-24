@@ -19,13 +19,13 @@
 <body>
     <h1>Guess the Number (1~100)</h1>
     <input type="text" id="guessInput" placeholder="Enter your guess">
-    <button onclick="counting()">Guess</button>
+    <button onclick="counting()" id="trial">Guess</button>
     <div id="result"></div>
     <h2>Guess history</h2>
     <div id="history"></div>
 
     <script>
-        const n = Math.floor(Math.random() * 101); 
+        const n = Math.floor(Math.random() * 100) + 1;  // 0 ~ 99 가 랜덤숫자로 나오니 + 1 을 해준다.
         let attempt = []; 
 
         function counting() {
