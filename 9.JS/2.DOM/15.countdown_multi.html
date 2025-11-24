@@ -9,6 +9,7 @@
     <h1>카운트다운 타이머</h1>
     <input type="number" id="timeInput" placeholder="초 입력">
     <button onclick="countdown()" id="startButton">시작</button>
+    <button onclick="reset()">초기화</button>
     <div id="display"></div>
     <script>
         function countdown() {
@@ -17,18 +18,22 @@
 
             // 새로운 DOM 요소 추가 하기
             const timerElement = document.createElement('p');
-            timerElement.innerHTML = "새로운 돔이에요";
             display.appendChild(timerElement);
             
             let timerId = setInterval(() => {
                 timeInput--;
                 if (timeInput <= 0) {
                     clearInterval(timerId);
-                    timerElement.innerHTML = `Time Out!`;
+                    timerElement.innerHTML = `집에갈 시간입니다.`;
                 } else {
                     timerElement.innerHTML = `${timeInput}초 남았습니다.`;
                 }
             }, 1000);
+        }
+
+        function reset() {
+            const display = document.getElementById("display");
+            display.innerHTML = "";
         }
     </script>
 </body>
