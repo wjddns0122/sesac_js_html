@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>복사하기</h1>
+    <textarea id="myTextArea">이거 글자를 가져가 보시오</textarea>
+    <script>
+        document.getElementById('myTextArea').addEventListener('copy', () => {
+            console.log('사용자가 내 블로그 글 퍼가는중...');
+            event.preventDefault();
+            event.clipboardData.setData('text/plain', "복사 금지 !!");
+        })
+    </script>
+</body>
+</html>

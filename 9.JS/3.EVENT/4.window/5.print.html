@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>프린트 출력 이벤트</h1>
+    <button id="printButton">출력하시오</button>
+    <script>
+        document.getElementById('printButton').addEventListener('click', () => {
+            window.print();
+        })
+
+        window.onbeforeprint = () => {
+            console.log('출력하기 직전에 호출');
+        }
+
+        window.onafterprint = () => {
+            console.log('출력 이후에 트리거 됌.');
+        }
+    </script>
+</body>
+</html>

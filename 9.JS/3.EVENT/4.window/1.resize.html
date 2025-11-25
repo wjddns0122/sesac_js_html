@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>윈도우 리사이즈 이벤트</h1>
+    <script>
+        window.addEventListener('resize', () => {
+            console.log('윈도우 창 크기가 변하는중..g')
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            console.log(`윈도우 사이즈가 ${width} ${height} 로 변경되었습니다.`)
+        });
+
+        // 윈도우 사이즈를 바꿀수가 있었다...
+        // 이게 이제 각종 광고와 악성코드 사이트가 악용을 하다 보니 이런것들이 다시 막히게 됨..
+        // window.resizeTo(800, 600);
+    </script>
+</body>
+</html>

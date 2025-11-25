@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>위치정보 가져오기</h1>
+    <button id="getLocation">내 위치정보는</button>
+    <p id="location"></p>
+
+    <script>
+        document.getElementById('getLocation').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                // navigator.geolocation.getCurrentPosition(Success_callback, failed_callback)
+
+                navigator.geolocation.getCurrentPosition((position) => {
+                    // 끝났을때.. 다시 나에게 알려주는데.. 콜백을 통해서 알려줌, 근데 나의 연산 범위를 벗어나는것
+                    // 위치를 가져왔을때의 콜백함수 내용이..
+                    console.log(position);
+                    const { latitude, longitude} = position.coords;
+                    document.getElementById('location').textContent = `당신의 위치는 위도${latitude}, 경도${longitude} 입니다.`
+                }, (error) => {
+                    document.getElementById('location').textContent = `정보를 가져오는데 실패했습니다.`
+                })
+            } else {
+                document.getElementById('location').textContent = '해당 기능이 지원되지 않는 브라우저 입니다.';
+            }
+        })
+    </script>
+</body>
+</html>

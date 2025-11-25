@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>웹캠 제어...</h1>
+    <video id="webcam" autoplay playsinline></video>
+
+    <script>
+        const videoElement = document.getElementById('webcam');
+
+        navigator.mediaDevices.getUserMedia({video: true}).then((stream => {
+            videoElement.srcObject = stream;
+        }).catch(error => {
+            alert('에러발생');
+        }));
+    </script>
+</body>
+</html>

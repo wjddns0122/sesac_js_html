@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #dragItem {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .placeholder {
+            position: absolute;
+            color: #999;
+        }
+
+        .container {
+            width: 200px;
+            height: 200px;
+            background-color: #f0f0f0;
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>드래그 앤 드롭</h1>
+
+    <div id="startZone" class="container">
+        <span class="placeholder" id="startPlaceholder">Drop here</span>
+        <div id="dragItem" draggable="true">드래그 미</div>
+    </div>
+
+    <div id="dropZone" class="container">
+        <span class="placeholder" id="dropPlaceholder">Drop here</span>
+    </div>
+
+    <script>
+        const dragItem = document.getElementById("dragItem");
+        const dropZone = document.getElementById("dropZone");
+        const startZone = document.getElementById("startZone");
+
+        dragItem.addEventListener('dragstart', () => {
+            console.log('start drag');
+        });
+
+        // dragover 이벤트 리스너 추가
+        [dropZone, startZone].forEach(zone => {
+            zone.addEventListener('dragover', (ev) => {
+                ev.preventDefault();    // 본연의 기능을 하지 않도록, 파일 등 드래그할 때 발생하는 기본 동작을 막음
+                console.log("드래그 오버");
+            });
+        });
+
+        // drop 이벤트 리스너 추가
+        [dropZone, startZone].forEach(zone => {
+            zone.addEventListener('drop', (ev) => {
+                ev.preventDefault();
+                console.log("여기에 드롭함");
+                zone.appendChild(dragItem);  // 드래그 아이템을 drop된 zone에 추가
+            });
+        });
+    </script>
+</body>
+</html>

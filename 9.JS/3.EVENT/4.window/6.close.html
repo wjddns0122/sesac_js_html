@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>가지마시오</h1>
+    <script>
+        window.addEventListener('beforeunload', () => {
+            event.returnValue = '가지마시오~';
+            // 사용자에게 표시하는 경고. 창을 닫을려고 하면 뜨는 메세지., 그러나 악용사례가 많음
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>브라우저로부터 정보 가져오기</h1>
+    <p><strong>User Agent:</strong><span id="userAgent"></span> </p>
+    <p><strong>Language:</strong><span id="language"></span> </p>
+    <p><strong>OnlineStatus:</strong><span id="onlineStatus"></span> </p>
+
+    <script>
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+
+        document.getElementById('language').textContent = navigator.language;
+
+        document.getElementById('onlineStatus').textContent = navigator.onLine ? "온라인" : "오프라인";
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="text" id="myInput" placeholder="타입 히어...">
+    <script>
+        // document.getElementById('myInput').addEventListener('input', (event) => {
+        // 나의 이벤트가 발생된 출처 = 타겟, 그 타겟이 가지고 있는 값
+        //     console.log('입력 값은: ', event.target.value);
+        // })
+
+        document.getElementById('myInput').addEventListener('change', (event) => {
+            // 입력 값이 끝나고, 변경된 내용만 저장
+            console.log('입력 값은: ', event.target.value);
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>윈도우 새창 열기 이벤트</h1>
+    <button id="openPopup">새창 열기</button>
+    <script>
+        document.getElementById('openPopup').addEventListener('click', () => {
+            const popup = window.open('', 'popupWindow', 'width=300,height=300');
+            popup.resizeTo(800, 600);
+        })
+    </script>
+</body>
+</html>

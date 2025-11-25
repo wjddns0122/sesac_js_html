@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #sizeInfo {
+            font-size: 10px;
+            line-height: 1.6;
+            background-color: #f6f6f6;
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>윈도우 리사이즈 이벤트</h1>
+    <div id="sizeInfo"></div>
+    <script>
+
+        function updateSizeInfo() {
+            const sizeInfo = document.getElementById('sizeInfo');
+            const innerWidth = window.innerWidth;
+            const innerHeight = window.innerHeight;
+            const outerWidth = window.outerWidth;
+            const outerHeight = window.outerHeight;
+
+            const screenWidth = screen.width;
+            const screenHeight = screen.height;
+
+            sizeInfo.innerHTML = `
+            <strong>Viewport (window.inner)</strong><br>
+            Width: ${innerWidth}px <br>
+            Height: ${innerHeight}px <br>
+
+            <strong>브라우저 윈도우 (window.outer)</strong><br>
+            Width: ${outerWidth}px <br>
+            Height: ${outerHeight}px <br>
+
+            <strong>Screen (화면 해상도)</strong><br>
+            Width: ${screenWidth}px <br>
+            Height: ${screenHeight}px <br>`
+        }
+
+        // 처음 로드 시 사이즈 정보를 업데이트
+        updateSizeInfo();
+
+        // 윈도우 크기 변경 시마다 사이즈 정보 업데이트
+        window.addEventListener('resize', () => {
+            console.log('윈도우 창 크기가 변하는중..');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            console.log(`윈도우 사이즈가 ${width} ${height} 로 변경되었습니다.`);
+            updateSizeInfo(); // 윈도우 크기 변경 시 sizeInfo 업데이트
+        });
+    </script>
+</body>
+</html>
