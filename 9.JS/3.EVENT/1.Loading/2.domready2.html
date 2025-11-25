@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>내 헤딩</h1>
+    <script>
+        // window 전역변수로, 브라우저의 xyz 의 초기화부터 다양한 기능들이 동작하고 제어할 수 있음
+        // 이 변수에 내가 원하는 함수들을 등록해서 여러가지 처리 가능
+        window.onload = function() {
+            // DOM, CSS, JS까지의 모든 페이지 로딩이 완료되었다.
+            console.log('모든 자원이 로딩이 완료되었습니다.');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('나는 DOM만 로딩이 끝남');
+        });
+    </script>
+</body>
+</html>

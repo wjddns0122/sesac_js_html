@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>포커스 이벤트</h1>
+    <input type="text" id="myInput" placeholder="아이디를 입력하시오">
+    <p id="lengthDisplay"><!-- 입력된 글자길이를 출력할곳 --></p>
+    <script>
+        document.getElementById("myInput").addEventListener('focus', () => {
+            console.log("여기 포커스가 발생하였습니다.")
+        })
+
+        document.getElementById("myInput").addEventListener('blur', () => {
+            console.log("여기 아웃포커스/언포커스/블러가 발생하였습니다.")
+            const inputText = document.getElementById("myInput").value;
+            const inputTextLength = inputText.lenght;
+            document.getElementById('lengthDisplay').textContent = `입력된 글자수는 ${inputTextLength} 입니다.`;
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #clickArea {
+            width: 200px;
+            height: 100px;
+            background-color: lightblue;
+        }
+    </style>
+</head>
+<body>
+    <h1>컨텍스트 메뉴판</h1>
+    <div id="clickArea">우클릭해보시오</div>
+    <script>
+        document.addEventListener('contextmenu', (ev) => {
+            // console.log("컨텍스트 메뉴가 열림");
+            // console.log("이벤트 상세 내역: ", ev);
+            ev.preventDefault();    // 너의 본연의 기능을 하지 마세요.
+            alert('우클릭이 금지되어 있습니다.');
+        });
+    </script>
+</body>
+</html>
