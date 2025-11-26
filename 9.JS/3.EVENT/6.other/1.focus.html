@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="parent">
+        <input type="text" id="child">
+    </div>
+
+    <script>
+        document.getElementById('child').addEventListener('focusin', () => {
+            console.log('차일드 요소가 선택 되었습니다.');
+        });
+
+        document.getElementById('parent').addEventListener('focusin', () => {
+            console.log('부모 요소도 선택 되었습니다.');
+        });
+
+        // 이벤트 버블링
+        // focus/blur/mouseenter/mouseleave 이벤트 버블링 xx
+        // focusin/focusout/mouseover/mouseout 이벤트 버블링 ooo
+    </script>
+</body>
+</html>

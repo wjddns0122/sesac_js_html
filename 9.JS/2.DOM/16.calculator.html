@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);  /* 4개의 균등한 폭으로 */
+            grid-gap: 10px;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .calculator input {
+            grid-column: span 4;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        .calculator button {
+            padding: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="result" readonly>
+        <button onclick="appendSymbol(this.innerText)">+</button>
+        <button onclick="appendSymbol(this.innerText)">-</button>
+        <button onclick="appendSymbol(this.innerText)">*</button>
+        <button onclick="appendSymbol(this.innerText)">/</button>
+        <button onclick="appendNumber(this.innerText)">7</button>
+        <button onclick="appendNumber(this.innerText)">8</button>
+        <button onclick="appendNumber(this.innerText)">9</button>
+        <button onclick="calculate()">=</button>
+        <button onclick="appendNumber(this.innerText)">5</button>
+        <button onclick="appendNumber(this.innerText)">4</button>
+        <button onclick="appendNumber(this.innerText)">6</button>
+        <button onclick="clearResult()">C</button>
+        <button onclick="appendNumber(this.innerText)">1</button>
+        <button onclick="appendNumber(this.innerText)">2</button>
+        <button onclick="appendNumber(this.innerText)">3</button>
+        <button onclick="appendNumber(this.innerText)">0</button>
+    </div>
+
+    <script>
+        const resultInput = document.getElementById('result');
+
+        function appendNumber(symbol) {
+            resultInput.value += symbol;
+        }
+
+        function isSymbol(value) {
+            return ['+', '-', '*', '/'].includes(value);
+        }
+
+        function appendSymbol(symbol) {
+            const lastInput = resultInput.value.slice(-1);
+            if (!isSymbol(lastInput)) {
+                resultInput.value += symbol;
+            } else {
+                resultInput.value = resultInput.value.slice(0, -1);
+            }
+        }
+
+        function clearResult() {
+            resultInput.value = "";
+        }
+
+        function isDivisionByZero(expression) {
+            for (let i = 0; i < expression.length; i++) {
+                if (expression[i] == '/') {
+                    // 일단 '/' 즉 나누셈 부호 찾았음
+                    // 내 부호 뒤에 있는 게 0인지를 확인~
+                    if (expression[i + 1] == '0') {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        function calculate() {
+            // 2. 단 그외에도 다양한 형태의 버그/오류가 있을 수 있다.
+            // 그 중 어려운게,논리오류... (내가 잘못 생각했거나 (설계오류))
+            if (isDivisionByZero(resultInput.value)) {
+                resultInput.value = "0으로 나눌수 없습니다.";
+                return;
+            }
+
+            // 1. 예외처리의 가장 중요한 기본 개념을배움
+            // try{}구문안에서 원하는걸 수행한다.
+            // 그 구문안에서 어떤 에러가 나든지.. 에러가 발생하먄?? catch가능
+            try {
+                const result = eval(resultInput.value);
+                resultInput.value = result;
+            } catch (error) {
+                resultInput.value = "ERROR";
+                console.log(error);
+            }
+
+            const expression = resultInput.value.trim();
+            if (expression == "") {
+                resultInput.value = 'Error';
+                return;
+            }
+        }
+    </script>
+</body>
+</html>

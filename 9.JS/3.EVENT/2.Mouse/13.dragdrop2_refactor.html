@@ -41,6 +41,14 @@
         <span class="placeholder" id="startPlaceholder">Drop here</span>
         <div id="dragItem" draggable="true">드래그 미</div>
     </div>
+    
+    <div id="mid1Zone" class="container">
+        <span class="placeholder" id="placeholder">Drop here</span>
+    </div>
+
+    <div id="mid2Zone" class="container">
+        <span class="placeholder" id="placeholder">Drop here</span>
+    </div>
 
     <div id="dropZone" class="container">
         <span class="placeholder" id="dropPlaceholder">Drop here</span>
@@ -50,13 +58,15 @@
         const dragItem = document.getElementById("dragItem");
         const dropZone = document.getElementById("dropZone");
         const startZone = document.getElementById("startZone");
+        const mid1Zone = document.getElementById("mid1Zone");
+        const mid2Zone = document.getElementById("mid2Zone");
 
         dragItem.addEventListener('dragstart', () => {
             console.log('start drag');
         });
 
         // dragover 이벤트 리스너 추가
-        [dropZone, startZone].forEach(zone => {
+        [dropZone, startZone, mid1Zone, mid2Zone].forEach(zone => {
             zone.addEventListener('dragover', (ev) => {
                 ev.preventDefault();    // 본연의 기능을 하지 않도록, 파일 등 드래그할 때 발생하는 기본 동작을 막음
                 console.log("드래그 오버");
@@ -64,7 +74,7 @@
         });
 
         // drop 이벤트 리스너 추가
-        [dropZone, startZone].forEach(zone => {
+        [dropZone, startZone, mid1Zone, mid2Zone].forEach(zone => {
             zone.addEventListener('drop', (ev) => {
                 ev.preventDefault();
                 console.log("여기에 드롭함");

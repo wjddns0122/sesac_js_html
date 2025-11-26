@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #gallery {
+            display: flex;
+            gap: 10px; 
+        }
+
+        #gallery img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        #large-image-container {
+            position: relative;
+            width: 50%;
+            height: auto;
+        }
+
+        #large-image {
+            margin-top: 20px;
+            width: 100%;
+            display: none;
+            object-fit: cover;
+        }
+
+        #prev, #next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            font-size: 20px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #prev {
+            left: 10px; /* 왼쪽 중간 */
+        }
+
+        #next {
+            right: 10px; /* 오른쪽 중간 */
+        }
+    </style>
+</head>
+<body>
+    <h1>이미지 갤러리</h1>
+    <div class="gallery" id="gallery">
+        <img src="image/1.jpeg" alt="1" id="img1">
+        <img src="image/2.jpeg" alt="2" id="img2">
+        <img src="image/3.jpeg" alt="3" id="img3">
+    </div>
+    <div id="src-name"></div>
+    <div id="large-image-container">
+        <img id="large-image" src="" alt="">
+        <button id="prev">Prev</button>
+        <button id="next">Next</button>
+    </div>
+    
+    <script>
+        const images = [document.getElementById('img1'), document.getElementById('img2'), document.getElementById('img3')];
+        const largeImage = document.getElementById('large-image');
+        let currentIndex = 0;
+
+        images.forEach((img, index) => {
+            img.addEventListener('click', () => {
+                largeImage.src = img.src;
+                largeImage.style.display = 'block';
+                currentIndex = index;
+            });
+        });
+
+        document.getElementById('prev').addEventListener('click', () => {
+            currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
+            largeImage.src = images[currentIndex].src;
+        });
+
+        document.getElementById('next').addEventListener('click', () => {
+            currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
+            largeImage.src = images[currentIndex].src;
+        });
+    </script>
+</body>
+</html>

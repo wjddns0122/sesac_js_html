@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="chageColorBtn">배경색 바꾸기</button>
+    <div id="colorCode"></div>
+    <script>
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgb(${r} ${g} ${b})`;
+        }
+
+        function getRandomHexColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+
+            // 주의. 2가지 hex값을 만들어야함.
+            const hexR = r.toString(16);
+            const hexG = g.toString(16);
+            const hexB = b.toString(16);
+
+            return `#${hexR} ${hexG} ${hexB}`
+        }
+
+        document.getElementById('changeColorBtn').addEventListener('click', () => {
+            // const newColor = getRandomColor();
+            const newColor = getRandomHexColor();
+            document.getElementById('colorCode').textContent = newColor;
+
+            document.body.style.backgroundColor = newColor;
+        })
+    </script>
+</body>
+</html>

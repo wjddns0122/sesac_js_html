@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Image Slider Gallery</title>
+        <style>
+            #gallery {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            #gallery img {
+                width: 150px;
+                height: 150px;
+                object-fit: cover;
+                border-radius: 5px;
+                cursor: pointer;
+                border: 2px solid transparent;
+                transition: border 0.3s;
+            }
+            #gallery img:hover {
+                border-color: #333;
+            }
+
+            #large-image-container {
+                position: relative;
+                width: 500px; 
+                height: 350px;
+                border-radius: 10px;
+                overflow: hidden; 
+            }
+
+            #slider-track {
+                display: flex;
+                height: 100%;
+                transition: transform 0.5s ease-in-out; 
+            }
+
+            #slider-track img {
+                width: 100%; 
+                height: 100%;
+                object-fit: cover;
+                flex-shrink: 0;
+            }
+
+            #prevBtn,
+            #nextBtn {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 18px;
+                padding: 10px 15px;
+                cursor: pointer;
+                border: none;
+                background-color: rgba(197, 196, 196, 0.5);
+                border-radius: 5px;
+            }
+
+            #prevBtn { left: 10px; }
+            #nextBtn { right: 10px; }
+        </style>
+    </head>
+    <body>
+        <h1>이미지 갤러리</h1>
+        
+        <div id="gallery">
+            <img src="image/1.jpeg" alt="1" class="thumb" data-index="0" /> 
+            <img src="image/2.jpeg" alt="2" class="thumb" data-index="1" />
+            <img src="image/3.jpeg" alt="3" class="thumb" data-index="2" />
+        </div>
+
+        <div id="large-image-container">
+            <div id="slider-track">
+                <img src="image/1.jpeg" alt="1" />
+                <img src="image/2.jpeg" alt="2" />
+                <img src="image/3.jpeg" alt="3" />
+            </div>
+
+            <button id="prevBtn">prev</button> 
+            <button id="nextBtn">next</button>
+        </div>
+
+        <script>
+            const track = document.getElementById('slider-track');
+            const thumbnails = document.querySelectorAll('.thumb');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            let currentIndex = 0;
+            const totalImages = thumbnails.length;
+
+            function updateSlider() {
+                const translateValue = -(currentIndex * 100);
+                track.style.transform = `translateX(${translateValue}%)`;
+            }
+
+            thumbnails.forEach((thumb, index) => {
+                thumb.addEventListener('click', () => {
+                    currentIndex = index;
+                    updateSlider();
+                });
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentIndex === 0) {
+                    currentIndex = totalImages - 1; 
+                } else {
+                    currentIndex--;
+                }
+                updateSlider();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentIndex === totalImages - 1) {
+                    currentIndex = 0; 
+                } else {
+                    currentIndex++;
+                }
+                updateSlider();
+            });
+        </script>
+    </body>
+</html>
