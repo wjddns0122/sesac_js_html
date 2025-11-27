@@ -1,41 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <button id="chageColorBtn">배경색 바꾸기</button>
-    <div id="colorCode"></div>
-    <script>
-        function getRandomColor() {
-            const r = Math.floor(Math.random() * 256);
-            const g = Math.floor(Math.random() * 256);
-            const b = Math.floor(Math.random() * 256);
-            return `rgb(${r} ${g} ${b})`;
+    <title>랜덤 배경색 바꾸기</title>
+    <style>
+        * {
+            box-sizing: border-box;
         }
 
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px 30px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        #changeColorBtn {
+            padding: 10px 18px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+        }
+
+        #changeColorBtn:hover {
+            opacity: 0.9;
+        }
+
+        #colorCodeLabel {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        #colorCode {
+            margin-top: 5px;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>랜덤 배경색 바꾸기</h1>
+        <p>버튼을 누를 때마다 페이지의 배경색이 랜덤으로 바뀝니다.</p>
+
+        <button id="changeColorBtn">배경색 바꾸기</button>
+
+        <div id="colorCodeLabel">현재 색상 코드</div>
+        <div id="colorCode">-</div>
+    </div>
+
+    <script>
         function getRandomHexColor() {
             const r = Math.floor(Math.random() * 256);
             const g = Math.floor(Math.random() * 256);
             const b = Math.floor(Math.random() * 256);
 
-            // 주의. 2가지 hex값을 만들어야함.
-            const hexR = r.toString(16);
-            const hexG = g.toString(16);
-            const hexB = b.toString(16);
+            const hexR = r.toString(16).padStart(2, '0');
+            const hexG = g.toString(16).padStart(2, '0');
+            const hexB = b.toString(16).padStart(2, '0');
 
-            return `#${hexR} ${hexG} ${hexB}`
+            return `#${hexR}${hexG}${hexB}`;
+        }
+
+        // 필요하면 RGB도 쓸 수 있게 놔둠
+        function getRandomColorRGB() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgb(${r}, ${g}, ${b})`;
         }
 
         document.getElementById('changeColorBtn').addEventListener('click', () => {
-            // const newColor = getRandomColor();
             const newColor = getRandomHexColor();
-            document.getElementById('colorCode').textContent = newColor;
+            // const newColor = getRandomColorRGB();  // RGB 쓰고 싶으면 이 줄 사용
 
+            document.getElementById('colorCode').textContent = newColor;
             document.body.style.backgroundColor = newColor;
-        })
+        });
     </script>
 </body>
 </html>

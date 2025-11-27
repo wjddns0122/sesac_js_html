@@ -6,7 +6,7 @@
     <title>Document</title>
     <style>
         body {
-            background-color: lightgray;
+            background-color: rgb(221, 219, 219);
             display: flex;
             justify-content: center; 
             align-items: center; 
@@ -23,6 +23,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            background-color: white;
+            width: 400px;
+            height: 200px;
+            border: 1px solid rgb(168, 167, 167);
+            border-radius: 20px;
+            box-shadow: 5px 5px 5px rgb(168, 167, 167);
         }
 
         #buttons {
@@ -34,14 +40,14 @@
         button {
             width: 80px;
             height: 40px;
-            background-color: lightgray;
+            background-color: rgb(221, 219, 219);
             border: 1px solid gray;
         }
     </style>
 </head>
 <body>
     <div id="stopwatch-container">
-        <div id="display">00:00:00</div>
+        <div id="display">00:00.00</div>
 
         <div id="buttons">
             <button id="startBtn">Start</button>
@@ -71,24 +77,34 @@
             const formattedSeconds = seconds.toString().padStart(2, '0');
             const formattedMillis = millis.toString().padStart(2, '0');
 
-            display.textContent = `${formattedMinutes}:${formattedSeconds}:${formattedMillis}`
+            display.textContent = `${formattedMinutes}:${formattedSeconds}.${formattedMillis}`
         }
 
         function start() {
             timer = setInterval(updateTime, 10);
             isRunning = true;
+            if (isRunning == true) {
+                startBtn.setAttribute('disabled', 'disabled');
+                stopBtn.removeAttribute('disabled');
+            }
         }
 
         function stop() {
             clearInterval(timer);
             isRunning = false;
+            if (isRunning == false) {
+                stopBtn.setAttribute('disabled', 'disabled');
+                startBtn.removeAttribute('disabled');
+            }
         }
 
         function reset() {
             clearInterval(timer);
             isRunning = false;
             milliseconds = 0;
-            display.textContent = '00:00:00';
+            display.textContent = '00:00.00';
+            startBtn.removeAttribute('disabled');
+            stopBtn.removeAttribute('disabled');
         }
 
         startBtn.addEventListener('click', start);
