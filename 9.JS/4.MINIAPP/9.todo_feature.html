@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>투두리스트</h1>
+    <input type="text" id="new-todo" placeholder="할일을 입력하시오">
+    <button id="add-todo" disabled>입력</button>
+    <button id="all-complete">일괄 완료</button>
+    <button id="all-delete">일괄 삭제</button>
+    <ul id="todo-list"></ul>
+    <script>
+        const addBtn = document.getElementById('add-todo');
+        const newTodoInput = document.getElementById('new-todo');
+        const allCompleteBtn = document.getElementById('all-complete');
+        const allDeleteBtn = document.getElementById('all-delete');
+        const todoList = document.getElementById('todo-list');
+
+        newTodoInput.addEventListener('input', () => {
+            if (newTodoInput.value.trim() === "") {
+                addBtn.disabled = true;
+            } else {
+                addBtn.disabled = false;
+            }
+        });
+
+        addBtn.addEventListener('click', () => {
+            const newTodo = newTodoInput.value.trim();
+            if (newTodo !== "") {
+                const new_li = document.createElement('li');
+                new_li.innerHTML = `${newTodo} <button class="removeBtn">삭제</button>`;
+                todoList.appendChild(new_li);
+
+                new_li.addEventListener('click', () => {
+                    if (new_li.style.textDecoration === 'line-through') {
+                        new_li.style.textDecoration = 'none'; 
+                    } else {
+                        new_li.style.textDecoration = 'line-through'; 
+                    }
+                });
+
+                const removeBtn = new_li.querySelector('.removeBtn'); 
+                removeBtn.addEventListener('click', (event) => {
+                    event.stopPropagation(); 
+                    todoList.removeChild(new_li); 
+                });
+
+                newTodoInput.value = ""; 
+                addBtn.disabled = true; 
+            }
+        });
+
+        newTodoInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && newTodoInput.value.trim() !== "") {
+                event.preventDefault();
+                addBtn.click(); 
+            }
+        });
+
+        allCompleteBtn.addEventListener('click', () => {
+            const todoItems = todoList.getElementsByTagName('li');
+            for (let item of todoItems) {
+                item.style.textDecoration = 'line-through';
+            }
+        });
+
+        allDeleteBtn.addEventListener('click', () => {
+            todoList.innerHTML = ''; 
+        });
+    </script>
+</body>
+</html>

@@ -124,38 +124,28 @@
 
     <script>
         const searchInput = document.getElementById('searchInput');
-        // li를 가져오고 싶은데, id가 없음,.. 그러면 ul을 가져와서, 그 ul아래에 있는 li들을 가져와야함
         const itemsList = document.getElementById('itemsList');
-        const items = itemsList.getElementsByTagName('li');     // nodeList 
-        
-        const items2 = document.querySelectorAll('#itemsList li');
-        console.log(items);
-        console.log(items2);
+        const items = itemsList.getElementsByTagName('li');
 
+        let debounceTimer;
         searchInput.addEventListener('keydown', () => {
             const filter = searchInput.value;
-            // 방법1. for
-            // for (let i = 0; i < items.length; i++) {
-            //     const item = items[i];
-            //     const text = item.textContent || item.innerText;
-            //     if (text.includes(filter)) {
-            //         item.style.display = '';
-            //     } else {
-            //         item.style.display = 'none';
-            //     }
-            // }
 
-            // 방법2. forEach
-            // HTMLCollection 은 Array 로 변환해야함
-            // items2.forEach(item => {
-            Array.from(items).forEach(item => {
-                const text = item.textContent;
-                if (text.includes(filter)) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
+            // 이전 타이머가 있으면 취소
+            clearTimeout(debounceTimer);
+
+            // 타이머 설정 (500ms 후에 검색 실행)
+            debounceTimer = setTimeout(() => {
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    const text = item.textContent || item.innerText;
+                    if (text.includes(filter)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
                 }
-            })
+            }, 100); // 500ms 후에 검색 실행
         });
     </script>
 </body>

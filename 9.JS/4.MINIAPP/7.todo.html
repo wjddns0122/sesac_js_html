@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>투두리스트</h1>
+    <input type="text" id="new-todo" placeholder="할일을 입력하시오">
+    <button id="add-todo" disabled>입력</button>
+    <ul id="todo-list"></ul>
+    <script>
+        const addBtn = document.getElementById('add-todo');
+        const newTodoInput = document.getElementById('new-todo');
+
+        newTodoInput.addEventListener('input', () => {
+            if (newTodoInput.value.trim() == "") {
+                addBtn.disabled = true;
+            } else {
+                addBtn.disabled = false;
+            }
+        });
+
+        addBtn.addEventListener('click', () => {
+            const newTodo = newTodoInput.value.trim();
+            if (newTodo != "") {
+                const new_li = document.createElement('li');
+                new_li.textContent = newTodo;
+                const todoList = document.getElementById('todo-list');
+                todoList.appendChild(new_li);
+
+                newTodoInput.value = ""; 
+                addBtn.disabled = true; 
+            }
+        });
+
+        newTodoInput.addEventListener('keydown', (event) => {
+            if (event.key == 'Enter' && newTodoInput.value.trim() != "") {
+                event.preventDefault();
+                addBtn.click(); 
+            }
+        });
+    </script>
+</body>
+</html>
