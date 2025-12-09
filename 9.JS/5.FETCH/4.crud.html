@@ -29,7 +29,6 @@
     </div>
     <script>
         const requestURL = `https://jsonplaceholder.typicode.com/posts`
-        const requestURL1 = `https://jsonplaceholder.typicode.com/posts/1`
 
         document.getElementById('createPost').addEventListener('click', () => {
             const myUser = {
@@ -56,47 +55,6 @@
                     document.getElementById('result').innerHTML = JSON.stringify(data)
                 })
                 .catch(error => alert(error));
-        });
-
-        document.getElementById('readPost').addEventListener('click', () => {
-            fetch(requestURL1, {
-                method: 'PUT',
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify({
-                        id: 1,
-                        title: 'foo',
-                        body: 'bar',
-                        userId: 1,
-                    })
-                })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        document.getElementById('result'.innerHTML = JSON.stringify(data))
-                    });
-            });
-
-        document.getElementById('updatePost').addEventListener('click', () => {
-            fetch(requestURL1, {
-                method: 'PATCH',
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify({
-                    title: 'foo',
-            })
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                document.getElementById('result'.innerHTML = JSON.stringify(data))
-            });
-        });
-
-        document.getElementById('removePost').addEventListener('click', () => {
-            fetch(requestURL, {
-                method: 'DELETE',
-            });
         });
     </script>
 </body>

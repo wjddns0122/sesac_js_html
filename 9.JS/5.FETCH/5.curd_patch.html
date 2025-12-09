@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>착한아저씨 사이트에 CRUD 해보기</h1>
+    <div>
+        <h3>포스트 생성하기</h3>
+        <button id="createPost">포스트 생성</button>
+    </div>
+    <div>
+        <h3>포스트 조회하기</h3>
+        <button id="readPost">포스트 조회</button>
+    </div>
+    <div>
+        <h3>포스트 수정하기</h3>
+        <button id="updatePost">포스트 수정</button>
+    </div>
+    <div>
+        <h3>포스트 삭제하기</h3>
+        <button id="removePost">포스트 삭제</button>
+    </div>
+    <div>
+        <h3>공통결과를 출력할곳</h3>
+        <pre id="result"></pre>
+    </div>
+    <script>
+        const requestURL = `https://jsonplaceholder.typicode.com/posts`;
+        const requestURL1 = `${requestURL}/1`;
+
+        document.getElementById('createPost').addEventListener('click', () => {
+            const myUser = {
+                title: 'sesac',
+                body: 'seoul',
+                userId: 1,
+            };
+
+            fetch(requestURL, {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify(myUser)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("네트워크 오류");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('result').textContent = JSON.stringify(data);
+                })
+                .catch(error => alert(error));
+        });
+
+        document.getElementById('readPost').addEventListener('click', () => {
+            fetch(requestURL1)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("네트워크 오류");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    document.getElementById('result').textContent = JSON.stringify(data);
+                })
+                .catch((error) => alert(error));
+        });
+
+        document.getElementById('updatePost').addEventListener('click', () => {
+            fetch(requestURL1, {
+                method: 'PATCH',
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify({
+                    title: 'foo',
+                })
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("네트워크 오류");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    document.getElementById('result').textContent = JSON.stringify(data);
+                })
+                .catch((error) => alert(error));
+        });
+
+        document.getElementById('removePost').addEventListener('click', () => {
+            fetch(requestURL1, {
+                method: 'DELETE',
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("네트워크 오류");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    document.getElementById('result').textContent = JSON.stringify(data);
+                })
+                .catch((error) => alert(error));
+        });
+    </script>
+</body>
+</html>

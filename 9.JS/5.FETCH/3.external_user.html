@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>사용자 조회</h2>
+    <input type="number" id="userId" placeholder="사용자ID를 입력하세요">
+    <button id="loadContent">불러오기</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('loadContent').addEventListener('click', () => {
+            const userId = document.getElementById('userId').value;
+            const requestURL = `https://jsonplaceholder.typicode.com/users/${userId}`
+            fetch(requestURL)
+                .then(response => checkResponseStatus(response))
+                .then(data => renderRespondToResult(data))
+                .catch(error => {
+                    alert('요청한 사용자가 없습니다!');
+                });
+        });
+
+        function checkResponseStatus(response) {
+            if(!response.ok) {
+                throw new Error('네트워크 오류')
+            }
+            return response.json();     
+        }
+
+        function renderRespondToResult(data) {
+            // console.log(data);
+            document.getElementById('result').innerHTML = `
+                <p><strong>이름:</strong> ${data.name}</p>
+                <p><strong>이메일:</strong> ${data.email}</p>
+                <p><strong>전화번호:</strong> ${data.phone}</p>
+                <p><strong>웹사이트:</strong> ${data.website}</p>
+                `
+        }
+    </script>
+</body>
+</html>

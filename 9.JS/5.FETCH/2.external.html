@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>남에게 요청해서 정보 받아와서 표현하기</h2>
+    <button id="loadContent">불러오기</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('loadContent').addEventListener('click', () => {
+            // console.log('버튼 눌름');
+            // 착한아저씨 사이트에서 100개의 글중에 1번 글을 가져온다.
+            fetch('https://jsonplaceholder.typicode.com/posts/1')
+                .then(response => {
+                    if(!response.ok) {
+                        throw new Error('네트워크 오류')
+                    }
+                    return response.json();     // 오류가 없으면 너의 바이트스트림을 json객체로 변환해서 나아게 주이소.
+                })
+                .then(data => {
+                    console.log('성공한 데이터는 여기에...', data);
+                    document.getElementById('result').innerHTML = 
+                        `<p><strong>타이틀</strong>: ${data.title}</p><p><strong>바디:</strong> ${data.body}</p>`
+                })
+                .catch(error => {
+                    alert('오류!!');
+                })
+        });
+    </script>
+</body>
+</html>
