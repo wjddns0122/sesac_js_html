@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="dataLoad">데이터 로드</button>
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('dataLoad').addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:3100/api/posts');
+                const data = await response.json();
+                
+                console.log(data); 
+
+                for (const post of data) {
+                    html += `<p><strong>타이틀</strong>: ${post.title}</p>
+                             <p><strong>바디:</strong> ${post.body}</p>
+                             <hr>`; 
+                }
+
+                document.getElementById('result').innerHTML = html;
+
+            } catch (error) {
+                console.error("에러 발생:", error);
+                alert("데이터를 불러오는데 실패했습니다.");
+            }
+        })
+    </script>
+</body>
+</html>

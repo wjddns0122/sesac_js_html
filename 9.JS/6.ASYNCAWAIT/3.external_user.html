@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>사용자 조회</h2>
+    <input type="number" id="userId" placeholder="사용자ID를 입력하세요">
+    <button id="loadContent">불러오기</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('loadContent').addEventListener('click', async () => {
+            const userId = document.getElementById('userId').value;
+            const result = document.getElementById('result');
+
+            if (!userId) {
+                result.textContent = 'ID를 입력해주세요.';
+                return;
+            }
+
+            try {
+                const requestURL = `https://jsonplaceholder.typicode.com/users/${userId}`;
+                const response = await fetch(requestURL);
+                const data = await checkResponseStatus(response);
+                renderRespondToResult(data);
+            } catch (error) {
+                alert('알수 없는 오류')
+            }
+        });
+
+        async function checkResponseStatus(response) {
+            // if(!response.ok) {
+            //     throw new Error('네트워크 오류')
+            // }
+            // return response.json();     
+            try {
+                data = await response.json();
+            } catch (error) {
+                alert('파싱 오류입니다.', error)
+            }
+        }
+
+        function renderRespondToResult(data) {
+            // console.log(data);
+            document.getElementById('result').innerHTML = `
+                <p><strong>이름:</strong> ${data.name}</p>
+                <p><strong>이메일:</strong> ${data.email}</p>
+                <p><strong>전화번호:</strong> ${data.phone}</p>
+                <p><strong>웹사이트:</strong> ${data.website}</p>
+                `
+        }
+    </script>
+</body>
+</html>

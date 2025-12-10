@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랜덤 강아지</title>
+</head>
+<body>
+    <h1>강아지 API에서 이미지 가져오기</h1>
+    <button id="loadDog">사진 불러오기</button>
+    <div>
+        <img id="dogImg" alt="여기에 강아지 사진이 표시됩니다." style="width: 200px;">
+    </div>
+
+    <script>
+        const API_URL = 'https://dog.ceo/api/breeds/image/random';
+        const button = document.getElementById('loadDog');
+        const dogImg = document.getElementById('dogImg');
+
+        button.addEventListener('click', async () => {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                dogImg.src = data.message;
+                dogImg.alt = '랜덤 강아지 사진';
+            } catch (error) {
+                alert('알 수 없는 오류');
+            }})
+    </script>
+</body>
+</html>

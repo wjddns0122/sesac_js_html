@@ -4,3 +4,5 @@
 # 각종 문서파일 (워드 / 파워포인트)
 *.docx
 *.pptx
+
+node_modules

@@ -14,25 +14,45 @@
     <div>
         <h3>포스트 조회하기</h3>
         <button id="readPost">포스트 조회</button>
+        <input type="number" id="userId" placeholder="사용자 id를 입력하세요 (1~100)" value="1">
+        <button id="prevBtn">prev</button>
+        <button id="nextBtn">next</button>
     </div>
     <div>
         <h3>포스트 수정하기</h3>
-        <button id="updatePost">포스트 수정</button>
+        <button id="updatePost">포스트 수정 (현재 ID 기준)</button>
     </div>
     <div>
         <h3>포스트 삭제하기</h3>
-        <button id="removePost">포스트 삭제</button>
+        <button id="removePost">포스트 삭제 (현재 ID 기준)</button>
     </div>
     <div>
         <h3>공통결과를 출력할곳</h3>
         <pre id="result"></pre>
     </div>
+
     <script>
         const requestURL = `https://jsonplaceholder.typicode.com/posts`;
-        const requestURL1 = `${requestURL}/1`;
+        const userIdInput = document.getElementById('userId');
+        const resultBox = document.getElementById('result');
+
+        function fetchPostById(id) {
+            fetch(`${requestURL}/${id}`)
+                .then((response) => {
+                    if (!response.ok) throw new Error("네트워크 오류 또는 없는 게시물");
+                    return response.json();
+                })
+                .then((data) => {
+                    resultBox.textContent = JSON.stringify(data); 
+                })
+                .catch((error) => {
+                    resultBox.textContent = error;
+                    alert(error);
+                });
+        }
 
         document.getElementById('createPost').addEventListener('click', () => {
-            const myUser = {
+            const myPost = {
                 title: 'sesac',
                 body: 'seoul',
                 userId: 1,
@@ -40,74 +60,79 @@
 
             fetch(requestURL, {
                 method: 'POST',
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify(myUser)
+                headers: { 'Content-type': 'application/json; charset=UTF-8' },
+                body: JSON.stringify(myPost)
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("네트워크 오류");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    document.getElementById('result').textContent = JSON.stringify(data);
-                })
-                .catch(error => alert(error));
+            .then(response => response.json())
+            .then(data => {
+                resultBox.textContent = JSON.stringify(data);
+            })
+            .catch(error => alert(error));
         });
 
         document.getElementById('readPost').addEventListener('click', () => {
-            fetch(requestURL1)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("네트워크 오류");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    document.getElementById('result').textContent = JSON.stringify(data);
-                })
-                .catch((error) => alert(error));
+            const currentId = userIdInput.value;
+            if (!currentId) {
+                alert("ID를 입력해주세요!");
+                return;
+            }
+            fetchPostById(currentId);
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            let currentId = Number(userIdInput.value);
+            
+            if (currentId > 1) {
+                currentId -= 1;             
+                userIdInput.value = currentId;
+                fetchPostById(currentId);   
+            } else {
+                alert("1보다 작을 수 없습니다.");
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            let currentId = Number(userIdInput.value);
+
+            if (currentId < 100) {
+                currentId += 1;            
+                userIdInput.value = currentId;
+                fetchPostById(currentId);   
+            } else {
+                alert("100보다 클 수 없습니다.");
+            }
         });
 
         document.getElementById('updatePost').addEventListener('click', () => {
-            fetch(requestURL1, {
+            const currentId = userIdInput.value || 1; 
+            const targetURL = `${requestURL}/${currentId}`; 
+
+            fetch(targetURL, {
                 method: 'PATCH',
-                headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify({
-                    title: 'foo',
-                })
+                headers: { 'Content-type': 'application/json; charset=UTF-8' },
+                body: JSON.stringify({ title: '수정된 제목(foo)' })
             })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("네트워크 오류");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    document.getElementById('result').textContent = JSON.stringify(data);
-                })
-                .catch((error) => alert(error));
+            .then(response => response.json())
+            .then(data => {
+                resultBox.textContent = JSON.stringify(data);
+            })
+            .catch(error => alert(error));
         });
 
         document.getElementById('removePost').addEventListener('click', () => {
-            fetch(requestURL1, {
+            const currentId = userIdInput.value || 1; 
+            const targetURL = `${requestURL}/${currentId}`;
+
+            fetch(targetURL, {
                 method: 'DELETE',
             })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error("네트워크 오류");
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    document.getElementById('result').textContent = JSON.stringify(data);
-                })
-                .catch((error) => alert(error));
+            .then(response => {
+                if (!response.ok) throw new Error("삭제 실패");
+            })
+            .then(data => document.getElementById('result').innerText = `${data}`)
+            .catch(error => alert(error));
         });
+
     </script>
 </body>
 </html>

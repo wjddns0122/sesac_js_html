@@ -56,6 +56,58 @@
                 })
                 .catch(error => alert(error));
         });
+
+        document.getElementById('readPost').addEventListener('click', () => {
+            readPost();
+        });
+
+        function readPost() {
+            const readFirstPost = `${requestURL}/1`;
+            fetch(readFirstPost)
+            .then(response => response.json())
+            .then(data => document.getElementById('result').innerText = JSON.stringify(data))
+            .catch(error => alert(error))
+        }
+
+        document.getElementById('updatePost').addEventListener('click', () => {
+            const myUpdatedPost = {
+                id: 1,
+                title: 'hello',
+                body: 'world',
+                userId: 1,
+            }
+            updatePost(myUpdatedPost);
+        });
+
+        function updatePost(newPost) {
+            const updateFirstPost = `${requestURL}/1`
+            fetch(updateFirstPost, {
+                method: 'PUT',
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+                body: JSON.stringify(newPost)    // 객체를 문자화
+            })
+            .then(response => response.json())   // 문자를 객체화
+            .then(data => document.getElementById('result').innerText = JSON.stringify(data))
+            .catch(error => alert(error))
+        }
+
+        document.getElementById('deleteId').addEventListener('click', () => {
+            const deletePostId = 1;
+            deletePost(deletePostId);
+        })
+
+        function deletePost(postId) {
+            const deletePost = `${requestURL}/${postId}`
+            fetch(deletePost, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById('result').innerText = JSON.stringify(data))
+        }
+
+
     </script>
 </body>
 </html>

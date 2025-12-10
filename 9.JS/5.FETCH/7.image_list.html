@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Breed Select</title>
+</head>
+<body>
+    <h1>Random Dog Breed Image</h1>
+    
+    <label for="breed-select">Choose a Breed: </label>
+    <select id="breed-select">
+        <option>강아지를 선택하세요</option>
+    </select>
+
+    <label for="breed-select-sub">Choose a sub-breed: </label>
+    <select id="breed-select-sub">
+        <option>서브 품종을 선택하세요</option>
+    </select>
+
+    <button id="getPost">Fetch Image</button>
+    <div>
+        <img id="dogImg" alt="강아지 사진" src="">
+    </div>
+
+    <script>
+        const breedSelect = document.getElementById('breed-select');
+        const breedSelectSub = document.getElementById('breed-select-sub')
+        const getPostBtn = document.getElementById('getPost');
+        const dogImg = document.getElementById('dogImg');
+        const baseUrl = "https://dog.ceo/api";
+
+        fetch(`${baseUrl}/breeds/list/all`)
+            .then(response => response.json())
+            .then(data => {
+                const breeds = Object.keys(data.message);
+
+                for (const breed of breeds) {
+                    const option = document.createElement('option');
+                    option.value = breed;
+                    option.textContent = breed;
+                    breedSelect.appendChild(option);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+
+            
+        getPostBtn.addEventListener('click', () => {
+            const selectedBreed = breedSelect.value;
+            
+            if (!selectedBreed) {
+                alert("견종을 먼저 선택해주세요!");
+                return;
+            }
+
+            const imgURL = `${baseUrl}/breed/${selectedBreed}/images/random`;
+
+            fetch(imgURL)
+                .then(response => response.json())
+                .then(data => {
+                    dogImg.src = data.message; 
+                });
+        });
+    </script>
+</body>
+</html>

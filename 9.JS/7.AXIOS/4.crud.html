@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>착한아저씨 사이트에 CRUD 해보기</h1>
+    <div>
+        <h3>포스트 생성하기</h3>
+        <button id="createPost">포스트 생성</button>
+    </div>
+    <div>
+        <h3>포스트 조회하기</h3>
+        <button id="readPost">포스트 조회</button>
+    </div>
+    <div>
+        <h3>포스트 수정하기</h3>
+        <button id="updatePost">포스트 수정</button>
+    </div>
+    <div>
+        <h3>포스트 삭제하기</h3>
+        <button id="removePost">포스트 삭제</button>
+    </div>
+    <div>
+        <h3>공통결과를 출력할곳</h3>
+        <div id="result"></div>
+    </div>
+    <script>
+        // 숙제. 아래 있는 모든 fetch, then을 async,await로 변경하세요
+        const requestURL = `https://jsonplaceholder.typicode.com/posts`
+
+        document.getElementById('createPost').addEventListener('click', async () => {
+            const myUser = {
+                title: 'sesac',
+                body: 'seoul',
+                userId: 1,
+            };
+
+            try {
+                const response = await axios.get(requestURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify(myUser)
+                })
+                const data = await response.data;
+                document.getElementById('result').innerHTML = JSON.stringify(data)
+            } catch (error) {
+                alert('알 수 없는 에러입니다.')
+            }
+        });
+
+        document.getElementById('readPost').addEventListener('click', () => {
+            readPost();
+        });
+
+        async function readPost() {
+            const readFirstPost = `${requestURL}/1`;
+            try {
+                const response = await axios.get(readFirstPost)
+                const data = await response.data;
+                document.getElementById('result').innerText = JSON.stringify(data)
+            }
+            catch (error) {
+                alert('알 수 없는 에러입니다.', error)
+            }
+        }
+
+        document.getElementById('updatePost').addEventListener('click', () => {
+            const myUpdatedPost = {
+                id: 1,
+                title: 'hello',
+                body: 'world',
+                userId: 1,
+            }
+            updatePost(myUpdatedPost);
+        });
+
+        async function updatePost(newPost) {
+            const updateFirstPost = `${requestURL}/1`
+            try {
+                const response = await axios.get(updateFirstPost, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify(newPost)    // 객체를 문자화
+                })
+                const data = await response.data;
+                document.getElementById('result').innerText = JSON.stringify(data)
+            } catch (error) {
+                alert("알 수 없는 오류입니다.")
+            }
+        }
+
+        document.getElementById('deleteId').addEventListener('click', () => {
+            const deletePostId = 1;
+            deletePost(deletePostId);
+        })
+
+        async function deletePost(postId) {
+            const deletePost = `${requestURL}/${postId}`
+            try {
+                const response = await axios.get(deletePost, {
+                    method: 'DELETE',
+                })
+                const data = await response.data;
+                document.getElementById('result').innerText = JSON.stringify(data)
+            } catch(error) {
+                alert('알 수 없는 에러입니다.', error)
+            }
+        }
+    </script>
+</body>
+</html>
