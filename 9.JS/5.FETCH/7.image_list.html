@@ -9,14 +9,10 @@
     <h1>Random Dog Breed Image</h1>
     
     <label for="breed-select">Choose a Breed: </label>
-    <select id="breed-select">
-        <option>강아지를 선택하세요</option>
-    </select>
+    <select id="breed-select"></select>
 
     <label for="breed-select-sub">Choose a sub-breed: </label>
-    <select id="breed-select-sub">
-        <option>서브 품종을 선택하세요</option>
-    </select>
+    <select id="breed-select-sub"></select>
 
     <button id="getPost">Fetch Image</button>
     <div>
@@ -25,41 +21,98 @@
 
     <script>
         const breedSelect = document.getElementById('breed-select');
-        const breedSelectSub = document.getElementById('breed-select-sub')
+        const breedSelectSub = document.getElementById('breed-select-sub');
         const getPostBtn = document.getElementById('getPost');
         const dogImg = document.getElementById('dogImg');
-        const baseUrl = "https://dog.ceo/api";
+        const baseUrl = 'https://dog.ceo/api';
 
-        fetch(`${baseUrl}/breeds/list/all`)
-            .then(response => response.json())
-            .then(data => {
+        const setDefaultBreedOptions = () => {
+            breedSelect.innerHTML = '<option value="">강아지를 선택하세요</option>';
+        };
+
+        const setDefaultSubBreedOptions = () => {
+            breedSelectSub.innerHTML = '<option value="">서브 품종을 선택하세요</option>';
+        };
+
+        async function fetchJson(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('네트워크 오류');
+            return res.json();
+        }
+
+        async function loadBreeds() {
+            try {
+                setDefaultBreedOptions();
+                const data = await fetchJson(`${baseUrl}/breeds/list/all`);
                 const breeds = Object.keys(data.message);
-
-                for (const breed of breeds) {
+                breeds.forEach((breed, index) => {
                     const option = document.createElement('option');
                     option.value = breed;
                     option.textContent = breed;
                     breedSelect.appendChild(option);
+                    if (index === 0) breedSelect.value = breed; 
+                });
+                if (breedSelect.value) {
+                    await loadSubBreeds(breedSelect.value);
                 }
-            })
-            .catch(error => console.error("Error:", error));
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
-            
-        getPostBtn.addEventListener('click', () => {
+        async function loadSubBreeds(breed) {
+            setDefaultSubBreedOptions();
+            if (!breed) return;
+
+            try {
+                const data = await fetchJson(`${baseUrl}/breed/${breed}/list`);
+                const subBreeds = data.message || [];
+
+                if (subBreeds.length > 0) {
+                    subBreeds.forEach((subBreed, index) => {
+                        const option = document.createElement('option');
+                        option.value = subBreed;
+                        option.textContent = subBreed;
+                        breedSelectSub.appendChild(option);
+                        if (index === 0) breedSelectSub.value = subBreed;
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = '서브 품종 없음';
+                    breedSelectSub.appendChild(option);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        loadBreeds();
+
+        breedSelect.addEventListener('change', () => {
+            loadSubBreeds(breedSelect.value);
+        });
+
+        getPostBtn.addEventListener('click', async () => {
             const selectedBreed = breedSelect.value;
-            
+            const selectedSubBreed = breedSelectSub.value;
+
             if (!selectedBreed) {
-                alert("견종을 먼저 선택해주세요!");
+                alert('견종을 먼저 선택해주세요!');
                 return;
             }
 
-            const imgURL = `${baseUrl}/breed/${selectedBreed}/images/random`;
+            let imgURL = `${baseUrl}/breed/${selectedBreed}/images/random`;
+            if (selectedSubBreed) {
+                imgURL = `${baseUrl}/breed/${selectedBreed}/${selectedSubBreed}/images/random`;
+            }
 
-            fetch(imgURL)
-                .then(response => response.json())
-                .then(data => {
-                    dogImg.src = data.message; 
-                });
+            try {
+                const data = await fetchJson(imgURL);
+                dogImg.src = data.message;
+            } catch (error) {
+                alert(error.message || '이미지를 불러오지 못했습니다.');
+            }
         });
     </script>
 </body>
