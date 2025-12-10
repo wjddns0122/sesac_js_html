@@ -29,9 +29,9 @@
         <div id="result"></div>
     </div>
     <script>
-        // 숙제. 아래 있는 모든 fetch, then을 async,await로 변경하세요
         const requestURL = `https://jsonplaceholder.typicode.com/posts`
 
+        // Create Post (포스트 생성)
         document.getElementById('createPost').addEventListener('click', async () => {
             const myUser = {
                 title: 'sesac',
@@ -40,20 +40,19 @@
             };
 
             try {
-                const response = await axios.get(requestURL, {
-                    method: 'POST',
+                const response = await axios.post(requestURL, myUser, {
                     headers: {
                         'Content-type': 'application/json; charset=UTF-8',
-                    },
-                    body: JSON.stringify(myUser)
-                })
-                const data = await response.data;
-                document.getElementById('result').innerHTML = JSON.stringify(data)
+                    }
+                });
+                const data = response.data;
+                document.getElementById('result').innerHTML = JSON.stringify(data);
             } catch (error) {
-                alert('알 수 없는 에러입니다.')
+                alert('알 수 없는 에러입니다.');
             }
         });
 
+        // Read Post (포스트 조회)
         document.getElementById('readPost').addEventListener('click', () => {
             readPost();
         });
@@ -61,15 +60,15 @@
         async function readPost() {
             const readFirstPost = `${requestURL}/1`;
             try {
-                const response = await axios.get(readFirstPost)
-                const data = await response.data;
-                document.getElementById('result').innerText = JSON.stringify(data)
-            }
-            catch (error) {
-                alert('알 수 없는 에러입니다.', error)
+                const response = await axios.get(readFirstPost);
+                const data = response.data;
+                document.getElementById('result').innerText = JSON.stringify(data);
+            } catch (error) {
+                alert('알 수 없는 에러입니다.');
             }
         }
 
+        // Update Post (포스트 수정)
         document.getElementById('updatePost').addEventListener('click', () => {
             const myUpdatedPost = {
                 id: 1,
@@ -81,37 +80,33 @@
         });
 
         async function updatePost(newPost) {
-            const updateFirstPost = `${requestURL}/1`
+            const updateFirstPost = `${requestURL}/1`;
             try {
-                const response = await axios.get(updateFirstPost, {
-                    method: 'PUT',
+                const response = await axios.put(updateFirstPost, newPost, {
                     headers: {
                         'Content-type': 'application/json; charset=UTF-8',
-                    },
-                    body: JSON.stringify(newPost)    // 객체를 문자화
-                })
-                const data = await response.data;
-                document.getElementById('result').innerText = JSON.stringify(data)
+                    }
+                });
+                const data = response.data;
+                document.getElementById('result').innerText = JSON.stringify(data);
             } catch (error) {
-                alert("알 수 없는 오류입니다.")
+                alert("알 수 없는 오류입니다.");
             }
         }
 
-        document.getElementById('deleteId').addEventListener('click', () => {
+        // Delete Post (포스트 삭제)
+        document.getElementById('removePost').addEventListener('click', () => {
             const deletePostId = 1;
             deletePost(deletePostId);
-        })
+        });
 
         async function deletePost(postId) {
-            const deletePost = `${requestURL}/${postId}`
+            const deletePost = `${requestURL}/${postId}`;
             try {
-                const response = await axios.get(deletePost, {
-                    method: 'DELETE',
-                })
-                const data = await response.data;
-                document.getElementById('result').innerText = JSON.stringify(data)
-            } catch(error) {
-                alert('알 수 없는 에러입니다.', error)
+                await axios.delete(deletePost);
+                document.getElementById('result').innerText = `포스트 ${postId}가 삭제되었습니다.`;
+            } catch (error) {
+                alert('알 수 없는 에러입니다.');
             }
         }
     </script>
