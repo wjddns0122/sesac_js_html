@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="aniCanvas" width="400" height="200"></canvas>
+        <script>
+            const canvas = document.getElementById("aniCanvas");
+            const context = canvas.getContext("2d");
+
+            const ball = {
+                x: 50,
+                y: 50,
+                radius: 20,
+                vx: 1,
+                vy: 1,
+            };
+
+            function drawball() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                context.beginPath();
+                context.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+                context.fillStyle = "#0095DD";
+                context.fill();
+                context.closePath();
+
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+
+                if (
+                    ball.x + ball.radius >= canvas.width ||
+                    ball.x - ball.radius <= 0
+                ) {
+                    ball.vx = -ball.vx;
+                }
+                if (
+                    ball.y + ball.radius >= canvas.height ||
+                    ball.y - ball.radius <= 0
+                ) {
+                    ball.vy = -ball.vy;
+                }
+                requestAnimationFrame(drawball);
+            }
+
+            drawball();
+        </script>
+    </body>
+</html>

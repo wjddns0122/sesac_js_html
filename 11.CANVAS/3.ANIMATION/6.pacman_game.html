@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            body {
+                background-color: black;
+            }
+            canvas {
+                border: 1px solid white;
+            }
+            #scoreText {
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="scoreText">
+            Score: <span id="score"><!--점수가올곳--></span>
+        </div>
+        <canvas id="pacman" width="600" height="400"></canvas>
+
+        <script>
+            const canvas = document.getElementById("pacman");
+            const context = canvas.getContext("2d");
+
+            let pacman = {
+                x: 200,
+                y: 200,
+                size: 30,
+                speed: 2,
+            };
+
+            let startAngle = 0.2 * Math.PI;
+            let endAngle = 1.8 * Math.PI;
+            let mouthOpen = 1; // 1 = open, -1 = close
+            let mouthSpeed = 0.05;
+            let directionX = 1;
+            let directionY = 0;
+
+            let score = 0;
+
+            function clearScreen() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function drawPacman() {
+                context.beginPath();
+                context.moveTo(pacman.x, pacman.y);
+                context.arc(
+                    pacman.x,
+                    pacman.y,
+                    pacman.size,
+                    startAngle,
+                    endAngle
+                );
+                context.fillStyle = "yellow"; // 팩맨 트레이드마크 노랭이
+                context.fill();
+                context.closePath();
+            }
+
+            function updateMouth() {
+                if (
+                    startAngle <= 0.05 * Math.PI ||
+                    startAngle >= 0.25 * Math.PI
+                ) {
+                    mouthOpen *= -1; // 위에꺼나 이거나...
+                }
+
+                startAngle += mouthSpeed * mouthOpen;
+                endAngle -= mouthSpeed * mouthOpen;
+            }
+
+            function updatePosition() {
+                pacman.x += pacman.speed * directionX;
+                pacman.y += pacman.speed * directionY;
+
+                if (pacman.x > canvas.width - pacman.size) {
+                    pacman.x = canvas.width - pacman.size; // 화면 벗어나려고 하면, 그자리에 스탑~
+                }
+
+                if (pacman.y > canvas.height - pacman.size) {
+                    pacman.y = canvas.height - pacman.size;
+                }
+
+                if (pacman.y < pacman.size) {
+                    pacman.y = pacman.size;
+                }
+
+                if (pacman.x < pacman.size) {
+                    pacman.x = pacman.size;
+                }
+            }
+
+            function pacmanMovementHandler(ev) {
+                console.log("눌린키: ", ev.key);
+                switch (ev.key) {
+                    case "ArrowUp":
+                        directionY = -1;
+                        directionX = 0;
+                        break;
+                    case "ArrowDown":
+                        directionY = +1;
+                        directionX = 0;
+                        break;
+                    case "ArrowLeft":
+                        directionX = -1;
+                        directionY = 0;
+                        break;
+                    case "ArrowRight":
+                        directionX = +1;
+                        directionY = 0;
+                        break;
+                }
+            }
+            document.addEventListener("keydown", pacmanMovementHandler);
+
+            let foods = []; // 영어 문법상 말은 안되지만 내비두고...
+
+            function generateFood() {
+                const aliveCount = foods.filter((f) => !f.eaten).length;
+
+                // 원하는 갯수만큼 반복해서 foods 를 채우기... (지금은 3개)
+                for (let i = aliveCount; i < 3; i++) {
+                    foods.push({
+                        x: Math.random() * (canvas.width - 40) + 20,
+                        y: Math.random() * (canvas.height - 40) + 20,
+                        radius: 10,
+                        eaten: false,
+                    });
+                }
+            }
+
+            function drawFood() {
+                foods.forEach((food) => {
+                    // 2. 먹은건 안그린다.
+                    if (!food.eaten) {
+                        context.beginPath();
+                        context.arc(
+                            food.x,
+                            food.y,
+                            food.radius,
+                            0,
+                            2 * Math.PI
+                        );
+                        context.fillStyle = "white";
+                        context.fill();
+                        context.closePath();
+                    }
+                });
+            }
+
+            const scoreSpan = document.getElementById("score");
+
+            function checkFoodEatten() {
+                // 1. 나(pacman)의 위치와 먹이가 같은(근처) 에 있는지 확인해서, 그놈을 찾아다가 먹은거로 바꾼다.
+                foods.forEach((food) => {
+                    // console.log(`음식: ${food.x}, ${food.y}, 팩맨: ${pacman.x}, ${pacman.y} `);
+                    const dx = food.x - pacman.x;
+                    const dy = food.y - pacman.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < pacman.size && !food.eaten) {
+                        // console.log('먹었음');
+                        food.eaten = true;
+                        score += 10;
+                        scoreSpan.innerText = score;
+                    }
+                    // console.log('음식과 팩맨 사이의 거리: ', dist);
+                });
+
+                // 먹은 음식은 배열에서 제거 (정리) <-- 이런걸 안하면 메모리 leak 처럼 계속 배열이 무한 증식함..
+                foods = foods.filter((f) => !f.eaten);
+            }
+
+            /**************************
+             * 여기가 메인 루프입니다.
+             **************************/
+            function animatePacman() {
+                clearScreen();
+
+                generateFood();
+                drawFood();
+                drawPacman();
+                updateMouth();
+                updatePosition();
+                checkFoodEatten();
+
+                requestAnimationFrame(animatePacman);
+            }
+
+            animatePacman();
+        </script>
+    </body>
+</html>

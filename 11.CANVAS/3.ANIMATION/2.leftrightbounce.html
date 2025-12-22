@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="aniCanvas" width="400" height="200"></canvas>
+
+        <script>
+            const canvas = document.getElementById("aniCanvas");
+            const context = canvas.getContext("2d");
+            const size = 50;
+            let x = 0;
+            let direction = 1;
+
+            function draw() {
+                context.clearRect(0, 0, canvas.width, canvas.height); // 캔바스 크기만큼 지우기
+
+                context.fillStyle = "#FF0000";
+                context.fillRect(x, 50, size, size);
+
+                if (x == canvas.width - size) {
+                    // 화면 끝에 닿았으면, 방향 바꿈
+                    direction = -1;
+                } else if (x == 0) {
+                    // 다시 처음으로 왔으면, 또 방향 바꿈
+                    direction = 1;
+                }
+
+                x += 5 * direction;
+
+                console.log("현재 그리는곳: ", x);
+
+                requestAnimationFrame(draw);
+            }
+
+            draw();
+        </script>
+    </body>
+</html>

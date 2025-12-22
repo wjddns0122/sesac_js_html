@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=`, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <canvas id="myCanvas" width="400" height="200"></canvas>
+        <script>
+            const context = document
+                .getElementById("myCanvas")
+                .getContext("2d");
+
+            context.font = "30px Arial";
+            context.fillStyle = "#0095DD";
+            context.fillText("Hello, Canvas", 50, 100);
+            context.strokeText("Hello, Canvas", 50, 150);
+
+            context.font = "italic 40px Times New Roman";
+            context.fillStyle = "red";
+            context.fillText("Styled Text", 50, 50);
+        </script>
+    </body>
+</html>

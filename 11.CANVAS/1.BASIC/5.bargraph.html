@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=`, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <style>
+        canvas {
+            border: 1px solid red;
+        }
+    </style>
+    <body>
+        <canvas id="myCanvas" width="400" height="200"></canvas>
+        <script>
+            const canvas = document.getElementById("myCanvas");
+            const context = document
+                .getElementById("myCanvas")
+                .getContext("2d");
+
+            const graphData = {
+                A: 10,
+                B: 20,
+                C: 40,
+                D: 60,
+                E: 80,
+            };
+
+            drawBarGraph(graphData);
+
+            function drawBarGraph(data) {
+                const barWidth = 30;
+
+                let startX = 50;
+                const barHeightOffset = 20;
+
+                for (const key in data) {
+                    const barHeight = data[key];
+                    // console.log(`키: ${key}, 높이: ${barHeight}`);
+                    context.fillStyle = "blue";
+                    context.fillRect(
+                        startX,
+                        canvas.height - barHeight - barHeightOffset,
+                        barWidth,
+                        barHeight
+                    );
+
+                    // x축에 텍스트 쓰기
+                    context.fillStyle = "black";
+                    context.fillText(
+                        key,
+                        startX + barWidth / 2,
+                        canvas.height - 10
+                    );
+
+                    startX += 40; // 다 쓰고 이동
+                }
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            canvas {
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="aniCanvas" width="400" height="200"></canvas>
+
+        <script>
+            const canvas = document.getElementById("aniCanvas");
+            const context = canvas.getContext("2d");
+            let x = 0;
+
+            function draw() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.fillStyle = "#FF0000";
+                context.fillRect(x, 50, 50, 50);
+
+                if (x > canvas.width) {
+                    // 화면 초과하면 아무것도 안함
+                } else {
+                    x += 5;
+                }
+                console.log("현재 그리는곳: ", x);
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        </script>
+    </body>
+</html>

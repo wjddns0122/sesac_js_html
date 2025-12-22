@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=`, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <canvas id="myCanvas" width="400" height="200"></canvas>
+        <script>
+            const context = document
+                .getElementById("myCanvas")
+                .getContext("2d");
+
+            function drawText(x, y, text, font, style) {
+                context.font = font;
+                context.fillStyle = style;
+                context.fillText(text, x, y);
+            }
+
+            drawText(20, 40, "Hello Canvas!", "red", "30px Arial");
+            drawText(20, 80, "Hello SESAC!", "red", "30px Arial");
+            drawText(20, 40, "Hello Canvas!", "red", "30px Arial");
+            drawText(20, 40, "Hello Canvas!", "red", "30px Arial");
+            drawText(20, 40, "Hello Canvas!", "red", "30px Arial");
+        </script>
+    </body>
+</html>

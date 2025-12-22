@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <div>
+            <canvas id="myChart" width="400" height="200"></canvas>
+        </div>
+
+        <script>
+            const ctx = document.getElementById("myChart");
+            // 1. 데이터 정의 (data)
+            const data = {
+                labels: [
+                    "먹기",
+                    "잠자기",
+                    "공부하기",
+                    "티비보기",
+                    "멍때리기",
+                    "운동하기",
+                ],
+                datasets: [
+                    {
+                        label: "나의 하루 일과",
+                        data: [30, 40, 20, 10, 50, 40],
+                        backgroundColor: ["rgba(255, 99, 132, 0.5)"],
+                    },
+                ],
+            };
+
+            // 2. 챠트 설정 정의 (config)
+            const config = {
+                type: "radar",
+                data: data,
+                options: {
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 60,
+                            ticks: { stepSize: 5 },
+                        },
+                    },
+                },
+            };
+            // 3. 그린다.
+            const pieChart = new Chart(ctx, config);
+        </script>
+    </body>
+</html>

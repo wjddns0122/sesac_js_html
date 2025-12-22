@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            body {
+                background-color: black;
+            }
+            canvas {
+                border: 1px solid white;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="pacman" width="600" height="400"></canvas>
+
+        <script>
+            const canvas = document.getElementById("pacman");
+            const context = canvas.getContext("2d");
+
+            let pacmanSize = 30;
+            let startAngle = 0.2 * Math.PI;
+            let endAngle = 1.8 * Math.PI;
+            let mouthOpen = 1; // 1 = open, -1 = close
+            let mouthSpeed = 0.05;
+            let positionX = 200;
+            let positionY = 200;
+            let pacmanSpeed = 5;
+            let directionX = 1;
+            let directionY = 0;
+
+            function drawPacman() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                context.beginPath();
+                context.moveTo(positionX, positionY);
+                context.arc(
+                    positionX,
+                    positionY,
+                    pacmanSize,
+                    startAngle,
+                    endAngle
+                );
+                context.fillStyle = "yellow"; // 팩맨 트레이드마크 노랭이
+                context.fill();
+                context.closePath();
+            }
+
+            function updateMouth() {
+                if (
+                    startAngle <= 0.05 * Math.PI ||
+                    startAngle >= 0.25 * Math.PI
+                ) {
+                    // mouthOpen = -mouthOpen;
+                    mouthOpen *= -1; // 위에꺼나 이거나...
+                }
+
+                startAngle += mouthSpeed * mouthOpen;
+                endAngle -= mouthSpeed * mouthOpen;
+            }
+
+            function updatePosition() {
+                positionX += pacmanSpeed * directionX;
+                positionY += pacmanSpeed * directionY;
+
+                if (positionX > canvas.width - pacmanSize) {
+                    positionX = canvas.width - pacmanSize; // 화면 벗어나려고 하면, 그자리에 스탑~
+                }
+
+                if (positionY > canvas.height - pacmanSize) {
+                    positionY = canvas.height - pacmanSize;
+                }
+
+                if (positionY < 0 + pacmanSize) {
+                    positionY = 0 + pacmanSize;
+                }
+
+                if (positionX < 0 + pacmanSize) {
+                    positionX = 0 + pacmanSize;
+                }
+            }
+
+            function animatePacman() {
+                drawPacman();
+                updateMouth();
+                updatePosition();
+
+                requestAnimationFrame(animatePacman);
+            }
+
+            animatePacman();
+
+            document.addEventListener("keydown", (ev) => {
+                console.log("눌린키: ", ev.key);
+                switch (ev.key) {
+                    case "ArrowUp":
+                        directionY = -1;
+                        directionX = 0;
+                        // positionY -= pacmanSpeed;
+                        // positionX += 0;
+                        break;
+                    case "ArrowDown":
+                        directionY = +1;
+                        directionX = 0;
+                        // positionY += pacmanSpeed;
+                        // positionX += 0;
+                        break;
+                    case "ArrowLeft":
+                        directionX = -1;
+                        directionY = 0;
+                        // positionY += 0;
+                        // positionX -= pacmanSpeed;
+                        break;
+                    case "ArrowRight":
+                        directionX = +1;
+                        directionY = 0;
+                        // positionY += 0;
+                        // positionX += pacmanSpeed;
+                        break;
+                }
+            });
+        </script>
+    </body>
+</html>
