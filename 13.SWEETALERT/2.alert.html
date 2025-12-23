@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <!-- 검색해서, 이 라이브러리 불러온다. (운이 좋으면 css 하나로 끝난다) -->
+        <!-- 검색해서, 이 라이브러리 불러온다. (또는 운이 좋으면 js 하나로 끝난다) -->
+        <!-- 검색해서, 이 라이브러리 불러온다. (운이 좋으면 css/js1/js2 여러개로) -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <h1>스윗 얼럿의 다양한 팝업 경고창</h1>
+
+        <button onclick="basicAlert()">기본 성공</button>
+        <button onclick="successAlert()">성공 알림</button>
+        <button onclick="errorAlert()">에러 알림</button>
+        <button onclick="confirmAlert()">확인/취소 알림</button>
+        <button onclick="timerAlert()">시간후 자동닫기 알림</button>
+        <button onclick="inputAlert()">사용자 입력받기 알림</button>
+        <button onclick="ajaxAlert()">비동기 요청 시뮬레이션</button>
+
+        <script>
+            function basicAlert() {
+                Swal.fire("안녕하세요!", "기본 알림 팝업입니다.", "info");
+            }
+
+            function successAlert() {
+                Swal.fire({
+                    info: "success",
+                    title: "성공",
+                    text: "작업이 성공하였습니다",
+                    confirmButtonText: "좋아요",
+                });
+            }
+
+            function errorAlert() {
+                Swal.fire({
+                    info: "error",
+                    title: "에러",
+                    text: "알수 없는 오류가 발생하였습니다.",
+                    confirmButtonText: "흑흑 ㅠ.ㅠ",
+                });
+            }
+
+            function confirmAlert() {
+                Swal.fire({
+                    title: "정말 삭제하겠습니까??",
+                    text: "사용자의 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "삭제",
+                    cancelButtonText: "취소",
+                }).then((result) => {
+                    console.log("당신의 선택은~~", result);
+                    if (result.isConfirmed) {
+                        Swal.fire(
+                            "삭제 완료!",
+                            "소중한 고갱님의 데이터가 삭제되었습니다.",
+                            "success"
+                        );
+                    } else {
+                        Swal.fire("삭제 완료!", "뻥이지롱~", "info");
+                    }
+                });
+            }
+
+            function timerAlert() {
+                Swal.fire({
+                    title: "자동으로 닫힙니다",
+                    text: "3초 후에 당신의 컴퓨터는 폭파합니다",
+                    timer: 3000, // 거의 모든 함수가 다.. 받는 단위 ms
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    willClose: () => {
+                        console.log("펑~");
+                        Swal.fire("폭파!", "뻥이지롱~", "error");
+                    },
+                });
+            }
+
+            function inputAlert() {
+                Swal.fire({
+                    title: "이름을 입력하세요",
+                    input: "text",
+                    inputPlaceholder: "여기에 이름을 입력...",
+                    showCancelButton: true,
+                    confirmButtonText: "제출",
+                    cancelButtonText: "취소",
+                }).then((result) => {
+                    if (result.isConfirmed && result.value) {
+                        Swal.fire(
+                            "입력이 성공적으로...",
+                            `입력값: ${result.value}`
+                        );
+                        console.log("사용자 입력: ", result.value);
+                    }
+                });
+            }
+
+            function ajaxAlert() {
+                Swal.fire({
+                    title: "서버 요청 중...",
+                    text: "잠시만 기다려 주세요...",
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+
+                setTimeout(() => {
+                    Swal.fire({
+                        info: "success",
+                        title: "요청 완료!",
+                        text: "서버 응답을 받았습니다.",
+                    });
+                }, 2000);
+            }
+        </script>
+    </body>
+</html>

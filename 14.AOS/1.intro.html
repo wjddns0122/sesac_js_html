@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css"
+        />
+        <style>
+            body {
+                height: 2000px; /* 스크롤을 위해서.. */
+                padding: 50px;
+            }
+            .box {
+                margin: 100px 0;
+                padding: 40px;
+                background: #f0f0f0;
+                border: 2px solid #ccc;
+                text-align: center;
+                font-size: 24px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>스크롤하면 등장하는 요소 라이브러리 AOS</h1>
+
+        <!-- 박스 | 이펙트 | 특징
+    1번 박스 | fade-up | 빠르게 위로 등장
+    2번 박스 | fade-right | 느리게 오른쪽으로 등장 (200ms 지연)
+    3번 박스 | fade-left | 왼쪽으로 등장 (400ms 지연)
+    4번 박스 | flip-up | 위로 뒤집히면서 등장
+    5번 박스 | zoom-in | 커지면서 등장
+    6번 박스 | zoom-out | 작아지면서 등장
+    7번 박스 | flip-left | 왼쪽으로 회전하면서 등장 -->
+
+        <div class="box" data-aos="fade-up">첫번째 박스</div>
+        <div class="box" data-aos="fade-right">두번째 박스</div>
+        <div class="box" data-aos="zoom-in">세번째 박스</div>
+        <div class="box" data-aos="zoom-out">네번째 박스</div>
+        <div class="box" data-aos="fade-left">다섯번째 박스</div>
+        <div class="box" data-aos="flip-left">여섯번째 박스</div>
+        <div class="box" data-aos="flip-right">일곱번째 박스</div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+        <script>
+            // AOS.init(); // AOS 기본 옵션으로 초기화
+
+            // 상세 옵션으로 초기화
+            AOS.init({
+                once: false,
+                offset: 120, // 스크롤 기준 위치
+                duration: 1000, // 애니메이션 지속 시간 (ms)
+                easing: "ease-in-out", // 기본 이징 함수
+            });
+        </script>
+    </body>
+</html>

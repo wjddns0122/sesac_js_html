@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous"
+        />
+    </head>
+    <body class="p-4">
+        <h1>Hello, world!</h1>
+        <h2 class="mx-4">부트스트랩 디스플레이 예제</h2>
+        <h2 class="my-4">부트스트랩 디스플레이 예제</h2>
+        <h2 class="m-4">부트스트랩 디스플레이 예제</h2>
+
+        <!-- Bootstrap Spacing Utilities 전체 정리
+    {property}{side}-{size}
+    구성요소	의미
+    m	margin
+    p	padding
+    t	top
+    b	bottom
+    s	start (왼쪽)
+    e	end (오른쪽)
+    x	좌우 (start + end)
+    y	상하 (top + bottom)
+    없음	전체 방향 (all)
+
+    예제 요약표
+    클래스명	의미	CSS로 번역
+    me-5	margin-right 3rem (LTR 기준)	margin-right: 3rem;
+    mt-3	margin-top 1rem	margin-top: 1rem;
+    mb-4	margin-bottom 1.5rem	margin-bottom: 1.5rem;
+    ms-2	margin-left 0.5rem (LTR 기준)	margin-left: 0.5rem;
+    mx-1	좌우 마진 0.25rem	margin-left/right: 0.25rem
+    my-0	상하 마진 0px	margin-top/bottom: 0
+    m-2	모든 방향 마진 0.5rem	margin: 0.5rem;  -->
+
+        <section class="mb-5">
+            <h4>1. d-* 클래스</h4>
+            <div class="d-block">d-block (블록 요소)</div>
+            <div class="d-block border m-2">d-block (블록 요소)</div>
+            <div class="d-block bg-light border p-2">d-block (블록 요소)</div>
+            <div class="d-block bg-dark text-white p-2">
+                d-block (블록 요소)
+            </div>
+            <div class="d-inline">d-inline (인라인 요소)</div>
+            <div class="d-inline">d-inline (인라인 요소)</div>
+        </section>
+
+        <section class="mb-5">
+            <h4>2. Visible 클래스</h4>
+            <div class="bg-success text-white p-2">항상 보이는 요소</div>
+            <div class="bg-success text-white m-2 invisible">
+                항상 안보이는 요소
+            </div>
+        </section>
+
+        <section class="mb-5">
+            <h4>3. Display 반응형 조정</h4>
+            <div class="d-none">이건 d-none이라 안보임</div>
+            <div class="d-sm-block d-none">
+                이건 d-none이라 안보이는데, 해상도가 작아지면 보임
+            </div>
+            <div class="d-lg-block d-none">
+                이건 d-none이라 안보임, 근데 해상도가 크면 보임
+            </div>
+
+            <!-- 이름	접두사	최소 해상도 (px)	설명
+            Extra small	없음 (xs)	0	기본값, 가장 작은 화면
+            Small	sm	576px	작은 태블릿 / 큰 모바일 가로
+            Medium	md	768px	태블릿
+            Large	lg	992px	작은 데스크톱 / 랩탑
+            Extra large	xl	1200px	일반 데스크톱
+            Extra extra large	xxl	1400px	큰 모니터(와이드) -->
+        </section>
+
+        <section class="mb-5">
+            <h4>4. 마진 / 패딩 클래스</h4>
+            <div class="bg-light border">기본 박스</div>
+            <div class="bg-warning border p-3 m-3">p-3, m-3 박스</div>
+            <div class="bg-info border mx-3">mx-3 (좌우만) 박스</div>
+            <div class="bg-danger border my-3">my-3 (상하만) 박스</div>
+        </section>
+
+        <section class="mb-5">
+            <h4>5. Flex 레이아웃</h4>
+            <div class="d-flex">
+                <div class="bg-primary text-white p-2">플렉스 아이템1</div>
+                <div class="bg-secondary text-white p-2">플렉스 아이템2</div>
+                <div class="bg-info text-white p-2">플렉스 아이템3</div>
+            </div>
+        </section>
+
+        <section class="mb-5">
+            <h4>6. Grid 레이아웃</h4>
+            <div class="d-grid" style="grid-template-columns: repeat(3, 1fr)">
+                <div class="bg-success text-white p-2">그리드1</div>
+                <div class="bg-danger text-white p-2">그리드2</div>
+                <div class="bg-info text-white p-2">그리드3</div>
+            </div>
+        </section>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>

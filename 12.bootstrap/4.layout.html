@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous"
+        />
+    </head>
+    <body>
+        <!-- 그리스 시스템 -->
+        <div class="container">
+            <h2 class="text-center my-4">부트스트랩 그리드 예제</h2>
+            <div class="row">
+                <div class="col">1번 열</div>
+                <div class="col">2번 열</div>
+                <div class="col">3번 열</div>
+                <div class="col">4번 열</div>
+                <div class="col">5번 열</div>
+                <div class="col">6번 열</div>
+                <div class="col">7번 열</div>
+                <div class="col">8번 열</div>
+                <div class="col">9번 열</div>
+                <div class="col">10번 열</div>
+                <div class="col">11번 열</div>
+                <div class="col">12번 열</div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <!-- https://getbootstrap.com/docs/5.3/layout/grid/ -->
+                <!-- col, medium(md), 4 -->
+                <!-- 
+                xs	extra small (초소형)	<576px
+                sm	small (소형)	        ≥576px
+                md	medium (중간)	        ≥768px
+                lg	large (대형)	        ≥992px
+                xl	extra large (초대형)	≥1200px
+                xxl	extra extra large (초초대형)	≥1400px
+
+                4칸을 차지: md(768px 이상) 화면 크기에서 12칸 그리드 중 4칸을 차지
+             -->
+                <div class="col-md-4">4칸짜리 열</div>
+                <div class="col-md-8">8칸짜리 열</div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-4" style="background-color: lightblue">
+                    4칸열
+                </div>
+                <div class="col-6" style="background-color: lightgreen">
+                    6칸열
+                </div>
+                <div class="col-8" style="background-color: lightcoral">
+                    8칸열
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <h2 class="text-center my-4">부트스트랩 반응형 예제</h2>
+            <div class="row">
+                <div
+                    class="col-12 col-sm-6 col-md-4 col-lg-3 bg-primary text-white p-3"
+                >
+                    Box1
+                </div>
+                <div
+                    class="col-12 col-sm-6 col-md-4 col-lg-3 bg-success text-white p-3"
+                >
+                    Box2
+                </div>
+                <div
+                    class="col-12 col-sm-6 col-md-4 col-lg-3 bg-danger text-white p-3"
+                >
+                    Box3
+                </div>
+                <div
+                    class="col-12 col-sm-6 col-md-4 col-lg-3 bg-warning text-white p-3"
+                >
+                    Box4
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- d- 시리즈를 잘 써서.. 아래 내용을 완성하시오.. 
+         d-block, d-none, d-md-none, d-md-block, d-lg-block, d-lg-none, d-xl-none, d-xl-block... 등등등
+        -->
+
+            <!-- 
+                xs	extra small (초소형)	<576px
+                sm	small (소형)	        ≥576px
+                md	medium (중간)	        ≥768px
+                lg	large (대형)	        ≥992px
+                xl	extra large (초대형)	≥1200px
+                xxl	extra extra large (초초대형)	≥1400px
+
+                4칸을 차지: md(768px 이상) 화면 크기에서 12칸 그리드 중 4칸을 차지
+        -->
+            <h2 class="text-center my-4">반응형 두번째 예제</h2>
+            <div
+                class="d-block d-sm-none bg-success text-white p-3 text-center"
+            >
+                아주 작은 화면에서만 보입니다 (576px 미만)
+            </div>
+            <div
+                class="d-none d-sm-block d-md-none bg-primary text-white p-3 text-center"
+            >
+                작은 화면에서만 보입니다 (576px 이상, 768px 미만)
+            </div>
+            <div
+                class="d-none d-md-block d-lg-none bg-info text-white p-3 text-center"
+            >
+                중간 화면에서만 보입니다 (768px 이상, 992px 미만)
+            </div>
+            <div
+                class="d-none d-lg-block d-xl-none bg-warning text-white p-3 text-center"
+            >
+                작은 화면에서만 보입니다 (992px 이상, 1200px 미만)
+            </div>
+            <div class="d-none d-xl-block bg-danger text-white p-3 text-center">
+                작은 화면에서만 보입니다 (1200px 이상)
+            </div>
+        </div>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"
+        ></script>
+    </body>
+</html>

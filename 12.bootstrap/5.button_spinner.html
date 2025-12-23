@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous"
+        />
+    </head>
+    <body>
+        <h1>로딩 버튼 구현하기!</h1>
+        <button id="loadBtn" class="btn btn-primary me-2">
+            <span class="spinner-border spinner-border-sm d-none"></span>
+            <span class="button-text">데이터 로딩</span>
+        </button>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"
+        ></script>
+        <script>
+            const loadBtn = document.getElementById("loadBtn");
+            const spinner = loadBtn.querySelector(".spinner-border");
+            const loadBtnText = loadBtn.querySelector(".button-text");
+
+            loadBtn.addEventListener("click", () => {
+                loadBtn.disabled = true;
+                spinner.classList.remove("d-none");
+                loadBtnText.textContent = "로딩중...";
+            });
+        </script>
+    </body>
+</html>
