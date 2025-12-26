@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <!-- css 가져온다 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <h1>부트스트랩 경보(alert) 닫기</h1>
+
+        <!-- 경보 + 닫기버튼 -->
+        <div class="container my-4">
+            <div
+                class="alert alert-danger alert-dismissible fade show"
+                role="alert"
+            >
+                닫을 수 있는 알림 메시지입니다.
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                ></button>
+            </div>
+        </div>
+
+        <!-- 아래는 자동으로 닫을 예정 -->
+        <div class="container my-4">
+            <div
+                id="auto-close-alert"
+                class="alert alert-warning alert-dismissible fade show"
+                role="alert"
+            >
+                닫을 수 있는 알림 메시지입니다.
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                ></button>
+            </div>
+        </div>
+
+        <script>
+            setTimeout(() => {
+                const alert = document.getElementById("auto-close-alert");
+                if (alert) {
+                    alert.classList.remove("show"); // 숨김방법1
+                    alert.classList.add("fade"); // 페이드해서 사라지게 하려고...
+                    alert.remove(); // 숨김방법2
+                }
+            }, 3000); // 3초 후에 안에 있는 콜백을 실행하시오.
+        </script>
+        <!-- script 가져온다 -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

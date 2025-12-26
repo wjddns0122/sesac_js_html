@@ -34,7 +34,7 @@
                 spinner.classList.remove("d-none");
                 loadBtnText.textContent = "로딩중...";
 
-                // 일부로 1초 쉬기
+                // 일부로 1초 쉬기 -> 비동기를 이용해서 promoise 객체로 리턴을 해주고 그 타임아웃이 1초를 기달렸다가 실행해준다
                 await new Promise((resolve) => setTimeout(resolve, 1000)); // 1초 기다렸다가 끝
 
                 // 이제 Fetch 전구간을 try-except로 처리해야함..
